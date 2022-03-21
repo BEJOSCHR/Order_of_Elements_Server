@@ -1,2 +1,2 @@
 # Order_of_Elements
-The clientside of the game Order of Elements
+The serverside of the game Order of Elements
