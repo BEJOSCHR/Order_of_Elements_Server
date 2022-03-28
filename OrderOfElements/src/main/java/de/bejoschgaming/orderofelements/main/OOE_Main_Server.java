@@ -1,14 +1,11 @@
 package de.bejoschgaming.orderofelements.main;
 
-import de.bejoschgaming.orderofelements.graphics.GraphicsHandler;
-
-public class OOE_Main {
+public class OOE_Main_Server {
 
 	public static void main(String[] args) {
 		
 		System.out.println("Starting Order of Elements - OOE");
 		
-		GraphicsHandler.initVisuals();
 		
 	}
 
