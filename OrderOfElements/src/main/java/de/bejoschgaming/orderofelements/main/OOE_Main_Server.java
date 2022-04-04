@@ -3,6 +3,7 @@ package de.bejoschgaming.orderofelements.main;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import de.bejoschgaming.orderofelements.connection.ConnectionHandler;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 
 public class OOE_Main_Server {
@@ -15,6 +16,8 @@ public class OOE_Main_Server {
 		
 		ConsoleHandler.startUserInputScanner();
 		
+		ConnectionHandler.startServerConnection();
+		
 		startMillis = System.currentTimeMillis();
 		ConsoleHandler.printMessageInConsole("Startup finished!", true);
 		
@@ -25,6 +28,8 @@ public class OOE_Main_Server {
 		ConsoleHandler.printMessageInConsole("Stopping OrderOfElements_Server [OOE_S]...", true);
 		
 		ConsoleHandler.stopUserInputScanner();
+		
+		ConnectionHandler.closeServerConnection();
 		
 		ConsoleHandler.printMessageInConsole("Shuttdown finished! [Runtime: "+(System.currentTimeMillis()-startMillis)/1000/60+" Minutes]", true);
 		

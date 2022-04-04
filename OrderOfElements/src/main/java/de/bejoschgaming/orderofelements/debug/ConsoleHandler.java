@@ -17,7 +17,7 @@ public class ConsoleHandler {
 //==========================================================================================================
 	/**
 	 * Print simple Message in the console
-	 * @param gameID - int - (-1) if not game related, else the gameID
+	 * @param gameID - int - (-1) its non specific debug - (0) means its a package debug - else a gameID related debug
 	 * @param text - String - The message to print
 	 * @param prefix - boolean - Enable/Disable Prefix
 	 */
