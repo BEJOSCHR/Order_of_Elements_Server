@@ -8,7 +8,6 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
-import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
@@ -24,7 +23,7 @@ public class ConnectionHandler {
 		
         try {
         	connectionAcceptor = new NioSocketAcceptor();
-            connectionAcceptor.getFilterChain().addLast("logger", new LoggingFilter());
+//        	connectionAcceptor.getFilterChain().addLast("logger", new LoggingFilter());
             connectionAcceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
             connectionAcceptor.setHandler(new ConnectionEventHandler());
             connectionAcceptor.setCloseOnDeactivation(true);
@@ -32,9 +31,10 @@ public class ConnectionHandler {
             connectionAcceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
 			connectionAcceptor.bind(new InetSocketAddress(PORT));
 			ConsoleHandler.printMessageInConsole("Serverconnection started!", true);
-		}catch (IOException error) {
+        } catch(IOException error) {
 			error.printStackTrace();
 			ConsoleHandler.printMessageInConsole("Starting serverconnection failed!", true);
+			System.exit(1);
 		}
 		
 	}

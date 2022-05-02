@@ -11,7 +11,7 @@ public class ConnectionEventHandler extends IoHandlerAdapter {
 	@Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         
-		cause.printStackTrace();
+//		cause.printStackTrace();
 		
     }
 	
@@ -22,11 +22,19 @@ public class ConnectionEventHandler extends IoHandlerAdapter {
 		
 	}
 	
+	@Override
+	public void sessionClosed(IoSession session) throws Exception {
+		
+		ConsoleHandler.printMessageInConsole("Client disconnected from "+session.getRemoteAddress(), true);
+		
+	}
+	
     @Override
     public void messageReceived(IoSession session, Object messageReceived) throws Exception {
         
     	String message = messageReceived.toString();
         
+    	ConsoleHandler.printMessageInConsole("Message received: "+message, true);
         
     }
     
