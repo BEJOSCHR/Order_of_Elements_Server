@@ -16,6 +16,8 @@ public class ConnectionHandler {
 
 	public static final int PORT = 6776;
 	private static IoAcceptor connectionAcceptor = null;
+
+	public static final String packetDivider = "_:_";
 	
 //	https://mina.apache.org/mina-project/userguide/ch2-basics/ch2.2-sample-tcp-server.html
 	

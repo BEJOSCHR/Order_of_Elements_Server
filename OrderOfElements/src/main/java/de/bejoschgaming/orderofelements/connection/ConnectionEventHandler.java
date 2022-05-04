@@ -5,6 +5,7 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
+import de.bejoschgaming.orderofelements.session.SessionHandler;
 
 public class ConnectionEventHandler extends IoHandlerAdapter {
 
@@ -18,14 +19,16 @@ public class ConnectionEventHandler extends IoHandlerAdapter {
 	@Override
 	public void sessionCreated(IoSession session) throws Exception {
 		
-		ConsoleHandler.printMessageInConsole("Client connected from "+session.getRemoteAddress(), true);
+		new ClientConnection(session);
+//		ConsoleHandler.printMessageInConsole("Client connected from "+session.getRemoteAddress(), true);
 		
 	}
 	
 	@Override
 	public void sessionClosed(IoSession session) throws Exception {
 		
-		ConsoleHandler.printMessageInConsole("Client disconnected from "+session.getRemoteAddress(), true);
+		SessionHandler.getSession(session).disconnect();
+//		ConsoleHandler.printMessageInConsole("Client disconnected from "+session.getRemoteAddress(), true);
 		
 	}
 	

@@ -15,13 +15,13 @@ public class ConsoleHandler {
 	public static Timer consoleInputScanner = new Timer();
 	
 //==========================================================================================================
+	public static void printMessageInConsole(String text, boolean prefix) { printMessageInConsole(-1, text, prefix); }
 	/**
 	 * Print simple Message in the console
 	 * @param gameID - int - (-1) its non specific debug - (0) means its a package debug - else a gameID related debug
 	 * @param text - String - The message to print
 	 * @param prefix - boolean - Enable/Disable Prefix
 	 */
-	public static void printMessageInConsole(String text, boolean prefix) { printMessageInConsole(-1, text, prefix); }
 	public static void printMessageInConsole(int gameID, String text, boolean prefix) {
 		
 		if(gameID == focusDebugID) {

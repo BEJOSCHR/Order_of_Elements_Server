@@ -5,6 +5,7 @@ import java.util.TimerTask;
 
 import de.bejoschgaming.orderofelements.connection.ConnectionHandler;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
+import de.bejoschgaming.orderofelements.session.SessionHandler;
 
 public class OOE_Main_Server {
 
@@ -28,6 +29,8 @@ public class OOE_Main_Server {
 		ConsoleHandler.printMessageInConsole("Stopping OrderOfElements_Server [OOE_S]...", true);
 		
 		ConsoleHandler.stopUserInputScanner();
+		
+		SessionHandler.disconnectAllSessions();
 		
 		ConnectionHandler.closeServerConnection();
 		
