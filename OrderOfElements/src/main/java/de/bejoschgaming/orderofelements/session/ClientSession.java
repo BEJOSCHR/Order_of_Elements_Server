@@ -25,7 +25,7 @@ public class ClientSession {
 		
 		this.profile = new PlayerProfile(playerID, playerName);
 		profileLoaded = true;
-		ConsoleHandler.printMessageInConsole("Client "+this.getConnection().getID()+" logged in as ("+playerName+"-"+playerID+")!", true);
+		ConsoleHandler.printMessageInConsole("Client "+this.initSessionID+" logged in as ("+playerName+"-"+playerID+")!", true);
 		
 	}
 	
