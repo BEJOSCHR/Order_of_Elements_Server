@@ -37,8 +37,8 @@ public class FileHandler {
 		
 		if(!ordner.exists()) {
 			try {
-				ordner.mkdir();
-				ConsoleHandler.printMessageInConsole("Created folder '"+ordner.getAbsolutePath()+"' on first write", true);
+				boolean success = ordner.mkdirs();
+				ConsoleHandler.printMessageInConsole("Created folder '"+ordner.getAbsolutePath()+"' on first write ("+success+")", true);
 			}catch(SecurityException error) {
 				ConsoleHandler.printMessageInConsole("No permissions to create folder for setting files, pls update via chmod!", true);
 			}
@@ -57,10 +57,11 @@ public class FileHandler {
 		if(readOutData(file_DbBackupData, "Successfully") == null) {
 			//HOLD THE DATA WHICH IS USED IF NO DB IS FOUND, JUST FOR TEST AND EMERGENCY USE BECAUSE NOT UP TO DATE MOST OF THE TIME!
 			createNewXmlFile(file_DbBackupData);
-			saveDataInFile(file_DbBackupData, "xxx", "yyy");
+			saveDataInFile(file_DbBackupData, "Usage", "HOLD THE DATA WHICH IS USED IF NO DB IS FOUND, JUST FOR TEST AND EMERGENCY USE BECAUSE NOT UP TO DATE MOST OF THE TIME!");
 			ConsoleHandler.printMessageInConsole("Created file '"+file_DbBackupData.getAbsolutePath()+"' on first write", true);
 		}
 		
+		ConsoleHandler.printMessageInConsole("Finished file system check!", true);
 		
 	}
 	
@@ -168,7 +169,7 @@ public class FileHandler {
 	 * @param key - String - The key should be searched for
 	 * @return Node - The node found from the key or null if not
 	 */
-	public static Node readOutNote(File file, String key) {
+	private static Node readOutNote(File file, String key) {
 		
 		try {
 			
