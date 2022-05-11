@@ -1,5 +1,7 @@
 package de.bejoschgaming.orderofelements.database;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -22,13 +24,14 @@ public class DatabaseHandler {
 	private static final String user = FileHandler.readOutData(FileHandler.file_Settings, "DB_User");
 	private static final String pw = FileHandler.readOutData(FileHandler.file_Settings, "DB_Password");
 
+	public static boolean connectedToDB = false;
 	private static Connection connection = null;
 	private static Timer keepConnectionTimer = null;
 
-	private static final String tabellName_profile = "Profile";
-	private static final String tabellName_stats = "Stats";
-	private static final String tabellName_friendlist = "Friends";
-	private static final String tabellName_friendRequests = "FriendRequests";
+	public static final String tabellName_profile = "Profile";
+	public static final String tabellName_stats = "Stats";
+	public static final String tabellName_friendlist = "Friends";
+	public static final String tabellName_friendRequests = "FriendRequests";
 
 	//QUELLE: https://www.youtube.com/watch?v=B928IDexsGk
 	
@@ -40,12 +43,13 @@ public class DatabaseHandler {
 			try {
 				connection = DriverManager.getConnection(url, user, pw);
 				keepConnectionTimer();
+				connectedToDB = true;
 				ConsoleHandler.printMessageInConsole("Succesfully connected to DB '"+DBname+"'!", true);
 			}catch(SQLException error) {
+				connectedToDB = false;
+				error.printStackTrace();
 				ConsoleHandler.printMessageInConsole("Connecting to DB failed!", true);
 				ConsoleHandler.printMessageInConsole("Using backup file data for startup without DB connection ...", true);
-//				ConsoleHandler.printMessageInConsole("Connecting to DB failed with following error:", true);
-//				error.printStackTrace();
 			}
 			
 		}else {
@@ -60,6 +64,7 @@ public class DatabaseHandler {
 			
 			try {
 				connection.close();
+				connectedToDB = false;
 				ConsoleHandler.printMessageInConsole("Succesfully disconnected from DB '"+DBname+"'!", true);
 			}catch (SQLException error) {
 				ConsoleHandler.printMessageInConsole("Disconnecting from DB failed with following error:", true);
@@ -175,21 +180,27 @@ public class DatabaseHandler {
 	
 // CREATE / INSERT ===============================================================================================================
 	
-	public static void insertNewPlayer(String name, String password) {
+	public static boolean insertNewPlayer(String name, String password) {
 		
 		try {
-			//TODO ID VIA AUTOINCREMENT IN DB ?! 
-			int id = 0; //ProfileHandler.getNextFreePlayerID(); //GET CURRENT NEXT FREE ID
-			//ProfileHandler.useFreePlayerID(); //INCREASE FOR NEW NUMBER
+			//ID VIA AUTOINCREMENT IN 
 			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europa/Berlin"));
-			String date = doubleWriteNumber(cal.get(Calendar.DAY_OF_MONTH))+"_"+doubleWriteNumber(cal.get(Calendar.MONTH))+"_"+doubleWriteNumber(cal.get(Calendar.YEAR));
-			//TODO HASH PW
-			String query = "INSERT INTO "+tabellName_profile+" (ID,Name,Datum,Password) VALUES ('"+id+"','"+name+"','"+date+"','"+password+"')";
+			String date = doubleWriteNumber(cal.get(Calendar.DAY_OF_MONTH))+"_"+doubleWriteNumber(cal.get(Calendar.MONTH)+1)+"_"+doubleWriteNumber(cal.get(Calendar.YEAR));
+			//HASH PW:
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+			messageDigest.update(password.getBytes());
+			String passwordHash = new String(messageDigest.digest());
+			String query = "INSERT INTO "+tabellName_profile+" (Name,Datum,Password) VALUES ('"+name+"','"+date+"','"+passwordHash+"')";
 			PreparedStatement stmt = connection.prepareStatement(query);
 			stmt.executeUpdate();
 			stmt.close();
+			return true;
 		} catch (SQLException error) {
+//			error.printStackTrace(); //SOMETIMES SHOULD BE THROWN AS CHECK FOR DUPLICATE ENTRY (REGISTER NAME AS EXAMPLE)
+			return false;
+		} catch (NoSuchAlgorithmException error) {
 			error.printStackTrace();
+			return false;
 		}
 		
 	}

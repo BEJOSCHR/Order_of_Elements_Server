@@ -1,12 +1,16 @@
 package de.bejoschgaming.orderofelements.session;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.mina.core.session.IoSession;
 
 import de.bejoschgaming.orderofelements.connection.ClientConnection;
+import de.bejoschgaming.orderofelements.database.DatabaseHandler;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
+import de.bejoschgaming.orderofelements.filesystem.FileHandler;
 import de.bejoschgaming.orderofelements.players.PlayerProfile;
 
 public class SessionHandler {
@@ -41,6 +45,49 @@ public class SessionHandler {
 		}else {
 			//NOT CONNECTED
 			return false;
+		}
+		
+	}
+	
+	public static boolean checkLoginData(String name, String password) {
+		
+		if(DatabaseHandler.connectedToDB) {
+			//CHECK VIA DB
+			
+			String selectedPW = DatabaseHandler.selectString(DatabaseHandler.tabellName_profile, "Password", "Name", name);
+			if(selectedPW == null) {
+				//NO ENTRY FOUND AT ALL
+				return false;
+			}else {
+				try {
+					//HASH PW:
+					MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+					messageDigest.update(password.getBytes());
+					String passwordHash = new String(messageDigest.digest());
+					if(passwordHash.equals(selectedPW)) {
+						//PW RIGHT
+						return true;
+					}else {
+						//PW WRONG
+						return false;
+					}
+				} catch (NoSuchAlgorithmException error) {
+					error.printStackTrace();
+					return false;
+				}
+			}
+			
+		}else {
+			//USE BACKUP FILE
+			
+			for(int i = 1 ; i <= 5 ; i++) {
+				String testName = FileHandler.readOutData(FileHandler.file_DbBackupData, "TestUser_"+i);
+				if(testName.equals(name)) {
+					return true;
+				}
+			}
+			return false;
+			
 		}
 		
 	}
@@ -94,7 +141,7 @@ public class SessionHandler {
 	public static ClientSession getSession(String name) {
 		
 		for(ClientSession session : connectedSessions) {
-			if(session.getProfile().getName().equals(name)) {
+			if(session.isProfileLoaded() && session.getProfile().getName().equals(name)) {
 				return session;
 			}
 		}
@@ -106,7 +153,7 @@ public class SessionHandler {
 	public static ClientSession getSession(PlayerProfile profile) {
 		
 		for(ClientSession session : connectedSessions) {
-			if(session.getProfile().getID() == profile.getID()) {
+			if(session.isProfileLoaded() && session.getProfile().getID() == profile.getID()) {
 				return session;
 			}
 		}
@@ -127,4 +174,12 @@ public class SessionHandler {
 	}
 	public static boolean isSessionConnected(ClientConnection connection) { return getSession(connection) != null;	}
 	//---
+	
+	public static List<ClientSession> getConnectedSessions() {
+		return connectedSessions;
+	}
+	public static int numberOfConnectedSessions() {
+		return connectedSessions.size();
+	}
+	
 }

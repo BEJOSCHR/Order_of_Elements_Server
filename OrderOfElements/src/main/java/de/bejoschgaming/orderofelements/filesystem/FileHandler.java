@@ -58,6 +58,11 @@ public class FileHandler {
 			//HOLD THE DATA WHICH IS USED IF NO DB IS FOUND, JUST FOR TEST AND EMERGENCY USE BECAUSE NOT UP TO DATE MOST OF THE TIME!
 			createNewXmlFile(file_DbBackupData);
 			saveDataInFile(file_DbBackupData, "Usage", "HOLD THE DATA WHICH IS USED IF NO DB IS FOUND, JUST FOR TEST AND EMERGENCY USE BECAUSE NOT UP TO DATE MOST OF THE TIME!");
+			saveDataInFile(file_DbBackupData, "TestUser_1", "User1");
+			saveDataInFile(file_DbBackupData, "TestUser_2", "User2");
+			saveDataInFile(file_DbBackupData, "TestUser_3", "User3");
+			saveDataInFile(file_DbBackupData, "TestUser_4", "User4");
+			saveDataInFile(file_DbBackupData, "TestUser_5", "VeryLongName");
 			ConsoleHandler.printMessageInConsole("Created file '"+file_DbBackupData.getAbsolutePath()+"' on first write", true);
 		}
 		

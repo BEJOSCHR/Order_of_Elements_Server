@@ -10,6 +10,7 @@ import de.bejoschgaming.orderofelements.players.PlayerProfile;
 public class ClientSession {
 
 	private int initSessionID = new Random().nextInt(90000)+10000;
+	private long connectTimestamp;
 	
 	private boolean profileLoaded = false;
 	private PlayerProfile profile = null;;
@@ -18,8 +19,10 @@ public class ClientSession {
 	public ClientSession(ClientConnection connection_) {
 		
 		this.connection = connection_;
+		this.connectTimestamp = System.currentTimeMillis();
 		
 	}
+	
 	
 	public void login(int playerID, String playerName) {
 		
@@ -46,6 +49,14 @@ public class ClientSession {
 		
 	}
 	
+	public String getShortInfo() {
+		if(this.profileLoaded) {
+			return "ID: "+this.getSessionID()+" - Name: "+this.profile.getName()+" - Packets send: "+this.connection.getSendPackets().size()+" - Connected: "+(System.currentTimeMillis()-this.connectTimestamp)/1000/60+" min";
+		}else { 
+			return "ID: "+this.getSessionID()+" - Not logged in yet!"+" - Packets send: "+this.connection.getSendPackets().size()+" - Connected: "+(System.currentTimeMillis()-this.connectTimestamp)/1000/60+" min";
+		}
+	}
+	
 	public int getSessionID() {
 		if(this.isProfileLoaded()) {
 			return profile.getID();
@@ -61,6 +72,9 @@ public class ClientSession {
 	}
 	public boolean isProfileLoaded() {
 		return profileLoaded;
+	}
+	public long getConnectTimestamp() {
+		return connectTimestamp;
 	}
 	
 }

@@ -11,7 +11,7 @@ import de.bejoschgaming.orderofelements.session.SessionHandler;
 
 public class OOE_Main_Server {
 
-	private static long startMillis = 0;
+	public static long startMillis = 0;
 	
 	public static void main(String[] args) {
 		

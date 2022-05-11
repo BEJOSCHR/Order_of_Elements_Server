@@ -4,7 +4,7 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 
-import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
+import de.bejoschgaming.orderofelements.session.ClientSession;
 import de.bejoschgaming.orderofelements.session.SessionHandler;
 
 public class ConnectionEventHandler extends IoHandlerAdapter {
@@ -35,9 +35,13 @@ public class ConnectionEventHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object messageReceived) throws Exception {
         
-    	String message = messageReceived.toString();
-        
-    	ConsoleHandler.printMessageInConsole("Message received: "+message, true);
+    	String rawMessage = messageReceived.toString();
+    	String[] splitMessage = rawMessage.split(ConnectionHandler.packetDivider);
+        int signal = Integer.parseInt(splitMessage[0]);
+        String message = splitMessage[1];
+    	
+    	ClientSession clientSession = SessionHandler.getSession(session);
+    	clientSession.getConnection().handlePacket(clientSession, signal, message);
         
     }
     
