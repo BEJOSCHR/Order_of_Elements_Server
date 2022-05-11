@@ -7,6 +7,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.bejoschgaming.orderofelements.main.OOE_Main_Server;
+import de.bejoschgaming.orderofelements.session.ClientSession;
+import de.bejoschgaming.orderofelements.session.SessionHandler;
 
 public class ConsoleHandler {
 
@@ -63,6 +65,7 @@ public class ConsoleHandler {
 					if(consoleInput.hasNextLine()) {
 						
 						if(focusDebugID != -1) {
+							
 							//GAME SESSION
 							int oldID = focusDebugID;
 							focusDebugID = -1; //LEAVE SESSION
@@ -75,6 +78,7 @@ public class ConsoleHandler {
 								printMessageInConsole("Terminated game session for game ["+oldID+"]", true);
 							}
 							printBlankLineInConsole();
+							
 						}else {
 							
 							String input = consoleInput.nextLine();
@@ -85,26 +89,26 @@ public class ConsoleHandler {
 							case "/help":
 								sendCommand_help(inputs);
 								break;
+							case "/packets":
+								sendCommand_packets(inputs);
+								break;
+							case "/overview":
+								sendCommand_overview(inputs);
+								break;
+							case "/session":
+								sendCommand_session(inputs);
+								break;
+							case "/sessions":
+								sendCommand_sessions(inputs);
+								break;
 							/*case "/game":
 								sendCommand_game(inputs);
 								break;
 							case "/games":
 								sendCommand_games(inputs);
 								break;
-							case "/player":
-								sendCommand_player(inputs);
-								break;
-							case "/players":
-								sendCommand_players(inputs);
-								break;
 							case "/groups":
 								sendCommand_groups(inputs);
-								break;
-							case "/packets":
-								sendCommand_packets(inputs);
-								break;
-							case "/overview":
-								sendCommand_overview(inputs);
 								break;
 							case "/update":
 								sendCommand_update(inputs);
@@ -128,7 +132,7 @@ public class ConsoleHandler {
 			}
 		}, 0, 60);
 		
-		printMessageInConsole("ConsoleInputScanner started", true);
+		printMessageInConsole("ConsoleInputScanner started!", true);
 		
 	}
 
@@ -155,24 +159,115 @@ public class ConsoleHandler {
 		consoleInputScanner.cancel();
 		consoleInputScanner.purge();
 		
-		printMessageInConsole("ConsoleInputScanner stopped", true);
+		printMessageInConsole("ConsoleInputScanner stopped!", true);
 		
 	}
 	
 	private static void sendCommand_help(List<String> inputs) {
 		
 		printMessageInConsole("Choose one of these commands:", true);
+		printMessageInConsole("'/packets ' - Join the packet session so you see the traffic of packets", true);
+		printMessageInConsole("'/overview ' - Gives a general overview about everything interessting", true);
+		printMessageInConsole("'/session [id|name] ' - Gives info about the session", true);
+		printMessageInConsole("'/sessions ([start] [end]) ' - Shows the list of connected sessions", true);
 		/*printMessageInConsole("'/game [id] ' - Join the game session so you see the log of the game", true);
 		printMessageInConsole("'/games [quantity] ' - Shows the list of running games", true);
-		printMessageInConsole("'/player [id|name] ' - Gives info about the player", true);
-		printMessageInConsole("'/players [quantity] ' - Shows the list of online player", true);
 		printMessageInConsole("'/groups [quantity] ' - Shows the list of active groups", true);
-		printMessageInConsole("'/packets ' - Join the packet session so you see the traffic of packets", true);
-		printMessageInConsole("'/overview ' - Gives a general overview about everything interesting", true);
 		printMessageInConsole("'/update [units|upgrades] ' - Reloads the units or the upgrades from the DB", true); */
 		printMessageInConsole("'/stop ' - Stoppes the whole server", true);
 		
 	}
+	
+	private static void sendCommand_overview(List<String> inputs) {
+		
+		printMessageInConsole("Running OrderOfElements-Server since "+(System.currentTimeMillis()-OOE_Main_Server.startMillis)/1000/60+" min", true);
+		printMessageInConsole("Running games: "+-1, true);
+		printMessageInConsole("Connected sessions: "+SessionHandler.numberOfConnectedSessions(), true);
+		int sendPackets = 0;
+		for(ClientSession session : SessionHandler.getConnectedSessions()) {
+			sendPackets += session.getConnection().getSendPackets().size();
+		}
+		printMessageInConsole("Send packets: "+sendPackets, true);
+		
+	}
+	
+	private static void sendCommand_packets(List<String> inputs) {
+		
+		printBlankLineInConsole();
+		printMessageInConsole("Joined packets session", true);
+		printBlankLineInConsole();
+		focusDebugID = 0;
+		
+	}
+
+	private static void sendCommand_session(List<String> inputs) {
+		
+		if(inputs.size() >= 2) {
+			try {
+				//ID
+				int id = Integer.parseInt(inputs.get(1));
+				ClientSession session = SessionHandler.getSession(id);
+				if(session != null) {
+					printMessageInConsole(session.getShortInfo(), true);
+				}else {
+					printMessageInConsole("There is no session with ID '"+id+"' online!", true);
+				}
+			}catch(NumberFormatException error) {
+				//NAME
+				String name = inputs.get(1);
+				ClientSession session = SessionHandler.getSession(name);
+				if(session != null) {
+					printMessageInConsole(session.getShortInfo(), true);
+				}else {
+					printMessageInConsole("There is no session with name '"+name+"' online!", true);
+				}
+			}
+		}else {
+			printMessageInConsole("/session [ID|Name]", true);
+		}
+		
+	}
+	
+	private static void sendCommand_sessions(List<String> inputs) {
+		
+		if(SessionHandler.getConnectedSessions().isEmpty()) {
+			//EMPTY
+			printMessageInConsole("There are no connected sessions at the moment!", true);
+			return;
+		}
+		
+		if(inputs.size() >= 3) {
+			//HAS NUMBER
+			try {
+				int start = Integer.parseInt(inputs.get(1));
+				int end = Integer.parseInt(inputs.get(2));
+				start = ( start > 0 ? start : 1 );
+				start = ( SessionHandler.numberOfConnectedSessions() >= start ? start : SessionHandler.numberOfConnectedSessions() );
+				end = ( end > 0 ? end : 1 );
+				end = ( SessionHandler.numberOfConnectedSessions() >= end ? end : SessionHandler.numberOfConnectedSessions() );
+				if(start > end) { ConsoleHandler.printMessageInConsole("Invalid argument! ["+start+">"+end+"]", true); return; }
+				printMessageInConsole("Showing "+start+" to "+end+" from max. "+SessionHandler.numberOfConnectedSessions()+" connected sessions:", true);
+				for(int i = start ; i <= end ; i++) {
+					ClientSession session = SessionHandler.getConnectedSessions().get(i-1);
+					printMessageInConsole(i+". "+session.getShortInfo(), true);
+				}
+			}catch(NumberFormatException error) {
+				printMessageInConsole("/sessions or /sessions [start] [end]", true);
+			}
+		}else { 
+			//NO NUMBER
+			int start = 1;
+			int end = 10;
+			end = ( SessionHandler.numberOfConnectedSessions() >= end ? end : SessionHandler.numberOfConnectedSessions() );
+			printMessageInConsole("Showing "+start+" to "+end+" from max. "+SessionHandler.numberOfConnectedSessions()+" connected sessions:", true);
+			for(int i = start ; i <= end ; i++) {
+				ClientSession session = SessionHandler.getConnectedSessions().get(i-1);
+				printMessageInConsole(i+". "+session.getShortInfo(), true);
+			}
+		}
+		
+	}
+
 	
 	private static void sendCommand_stop(List<String> inputs) {
 		

@@ -20,9 +20,7 @@ public class PlayerProfile {
 		//LOAD STATS ETC FROM DB
 		
 	}
-
-
-
+	
 	public int getID() {
 		return ID;
 	}

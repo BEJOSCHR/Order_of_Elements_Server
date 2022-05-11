@@ -11,13 +11,15 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
+import de.bejoschgaming.orderofelements.filesystem.FileHandler;
 
 public class ConnectionHandler {
 
-	public static final int PORT = 6776;
+	public static final int PORT = Integer.parseInt(FileHandler.readOutData(FileHandler.file_Settings, "CONNECTION_Port"));
+	public static final int IDLETIME = Integer.parseInt(FileHandler.readOutData(FileHandler.file_Settings, "CONNECTION_Idletime"));
 	private static IoAcceptor connectionAcceptor = null;
 
-	public static final String packetDivider = "_:_";
+	public static final String packetDivider = FileHandler.readOutData(FileHandler.file_Settings, "CONNECTION_Packetdivider");
 	
 //	https://mina.apache.org/mina-project/userguide/ch2-basics/ch2.2-sample-tcp-server.html
 	
@@ -30,7 +32,7 @@ public class ConnectionHandler {
             connectionAcceptor.setHandler(new ConnectionEventHandler());
             connectionAcceptor.setCloseOnDeactivation(true);
             connectionAcceptor.getSessionConfig().setReadBufferSize(2048);
-            connectionAcceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
+            connectionAcceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, IDLETIME);
 			connectionAcceptor.bind(new InetSocketAddress(PORT));
 			ConsoleHandler.printMessageInConsole("Serverconnection started!", true);
         } catch(IOException error) {
