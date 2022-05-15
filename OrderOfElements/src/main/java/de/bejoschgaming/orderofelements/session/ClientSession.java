@@ -26,7 +26,7 @@ public class ClientSession {
 	
 	public void login(int playerID, String playerName) {
 		
-		this.profile = new PlayerProfile(playerID, playerName);
+		this.profile = new PlayerProfile(this, playerID, playerName);
 		profileLoaded = true;
 		ConsoleHandler.printMessageInConsole("Client "+this.initSessionID+" logged in as ("+playerName+"-"+playerID+")!", true);
 		
@@ -44,6 +44,7 @@ public class ClientSession {
 		boolean worked = SessionHandler.unregisterSession(this);
 		if(worked) {
 			//ONLY DISCONNECT IF UNREGISTER WORKED
+			profile.disconnect();
 			connection.disconnect();
 		}
 		
@@ -51,7 +52,7 @@ public class ClientSession {
 	
 	public String getShortInfo() {
 		if(this.profileLoaded) {
-			return "ID: "+this.getSessionID()+" - Name: "+this.profile.getName()+" - Packets send: "+this.connection.getSendPackets().size()+" - Connected: "+(System.currentTimeMillis()-this.connectTimestamp)/1000/60+" min";
+			return "ID: "+this.getSessionID()+" - Name: "+this.profile.getName()+" - Decks: "+this.profile.getDecks().size()+" - Packets send: "+this.connection.getSendPackets().size()+" - Connected: "+(System.currentTimeMillis()-this.connectTimestamp)/1000/60+" min";
 		}else { 
 			return "ID: "+this.getSessionID()+" - Not logged in yet!"+" - Packets send: "+this.connection.getSendPackets().size()+" - Connected: "+(System.currentTimeMillis()-this.connectTimestamp)/1000/60+" min";
 		}

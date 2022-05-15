@@ -29,8 +29,10 @@ public class DatabaseHandler {
 	private static Timer keepConnectionTimer = null;
 
 	public static final String tabellName_profile = "Profile";
+	public static final String tabellName_decks = "Decks";
+	public static final String tabellName_maps = "Maps";
 	public static final String tabellName_stats = "Stats";
-	public static final String tabellName_friendlist = "Friends";
+	public static final String tabellName_friendList = "FriendList";
 	public static final String tabellName_friendRequests = "FriendRequests";
 
 	//QUELLE: https://www.youtube.com/watch?v=B928IDexsGk
@@ -101,7 +103,7 @@ public class DatabaseHandler {
 	public static String selectString(String tabelle, String target, String keyName, String key) {
 		
 		try {
-			String query = "SELECT "+target+" FROM "+tabelle+" where "+keyName+"='"+key+"'";
+			String query = "SELECT "+target+" FROM "+tabelle+" where ("+keyName+")=('"+key+"')";
 			PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			ResultSet rs = stmt.executeQuery();
 			rs.first();
@@ -118,7 +120,7 @@ public class DatabaseHandler {
 	public static int selectInt(String tabelle, String target, String keyName, String key) {
 		
 		try {
-			String query = "SELECT "+target+" FROM "+tabelle+" where "+keyName+"='"+key+"'";
+			String query = "SELECT "+target+" FROM "+tabelle+" where ("+keyName+")=('"+key+"')";
 			PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			ResultSet rs = stmt.executeQuery();
 			rs.first();
@@ -135,7 +137,7 @@ public class DatabaseHandler {
 	public static double selectDouble(String tabelle, String target, String keyName, String key) {
 		
 		try {
-			String query = "SELECT "+target+" FROM "+tabelle+" where "+keyName+"='"+key+"'";
+			String query = "SELECT "+target+" FROM "+tabelle+" where ("+keyName+")=('"+key+"')";
 			PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			ResultSet rs = stmt.executeQuery();
 			rs.first();
@@ -153,7 +155,7 @@ public class DatabaseHandler {
 	public static List<Integer> getAllWhereEqual_Int(String tabelle, String target, String keyName, String key) {
 		
 		try {
-			String query = "SELECT "+target+" FROM "+tabelle+" where "+keyName+"='"+key+"'";
+			String query = "SELECT "+target+" FROM "+tabelle+" where ("+keyName+")=('"+key+"')";
 			PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			ResultSet rs = stmt.executeQuery();
 			rs.first();
@@ -177,6 +179,89 @@ public class DatabaseHandler {
 		}
 		
 	}
+	public static List<String> getAllWhereEqual_Str(String tabelle, String target, String keyName, String key) {
+		
+		try {
+			String query = "SELECT "+target+" FROM "+tabelle+" where ("+keyName+")=('"+key+"')";
+			PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = stmt.executeQuery();
+			rs.first();
+			
+			List<String> result = new ArrayList<String>();
+			
+			try {
+				do {
+					result.add(rs.getString(target));
+				}while(rs.next());
+			}catch(SQLException error) {
+				//EMPTY RESULT SET
+			}
+			
+			rs.close();
+			stmt.close();
+			return result;
+		} catch (SQLException error) {
+			error.printStackTrace();
+			return null;
+		}
+		
+	}
+	
+	public static List<Integer> getAll_Int(String tabelle, String target) {
+		
+		try {
+			String query = "SELECT "+target+" FROM "+tabelle+"";
+			PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = stmt.executeQuery();
+			rs.first();
+			
+			List<Integer> result = new ArrayList<Integer>();
+			
+			try {
+				do {
+					result.add(rs.getInt(target));
+				}while(rs.next());
+			}catch(SQLException error) {
+				//EMPTY RESULT SET
+			}
+			
+			rs.close();
+			stmt.close();
+			return result;
+		} catch (SQLException error) {
+			error.printStackTrace();
+			return null;
+		}
+		
+	}
+	public static List<String> getAll_Str(String tabelle, String target) {
+		
+		try {
+			String query = "SELECT "+target+" FROM "+tabelle+"";
+			PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = stmt.executeQuery();
+			rs.first();
+			
+			List<String> result = new ArrayList<String>();
+			
+			try {
+				do {
+					result.add(rs.getString(target));
+				}while(rs.next());
+			}catch(SQLException error) {
+				//EMPTY RESULT SET
+			}
+			
+			rs.close();
+			stmt.close();
+			return result;
+		} catch (SQLException error) {
+			error.printStackTrace();
+			return null;
+		}
+		
+	}
+	
 	
 // CREATE / INSERT ===============================================================================================================
 	
@@ -208,13 +293,13 @@ public class DatabaseHandler {
 	/**
 	 * Insert data
 	 * @param tabelle - Table name
-	 * @param vars - The variables - Like this: (Name,ID,Datum,Password)
-	 * @param values - The values - Like this: ('BEJOSCH','1234','01_02_2000','abcba')
+	 * @param vars - The variables WITHOUT BRACKETS! - Like this: Name,ID,Datum,Password
+	 * @param values - The values WITHOUT BRACKETS! - Like this: 'BEJOSCH','1234','01_02_2000','abcba'
 	 */
 	public static void insertData(String tabelle, String vars, String values) {
 		
 		try {
-			String query = "INSERT INTO "+tabelle+" "+vars+" VALUES "+values;
+			String query = "INSERT INTO "+tabelle+" ("+vars+") VALUES ("+values+")";
 			PreparedStatement stmt = connection.prepareStatement(query);
 			stmt.executeUpdate();
 			stmt.close();
@@ -229,7 +314,7 @@ public class DatabaseHandler {
 	public static void updateString(String tabelle, String target, String value, String keyName, String key) {
 		
 		try {
-			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where "+keyName+"='"+key+"'";
+			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where ("+keyName+")=('"+key+"')";
 			PreparedStatement stmt = connection.prepareStatement(query);
 			stmt.executeUpdate();
 			stmt.close();
@@ -241,7 +326,7 @@ public class DatabaseHandler {
 	public static void updateInt(String tabelle, String target, int value, String keyName, String key) {
 		
 		try {
-			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where "+keyName+"='"+key+"'";
+			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where ("+keyName+")=('"+key+"')";
 			PreparedStatement stmt = connection.prepareStatement(query);
 			stmt.executeUpdate();
 			stmt.close();
@@ -253,7 +338,7 @@ public class DatabaseHandler {
 	public static void updateDouble(String tabelle, String target, double value, String keyName, String key) {
 	
 		try {
-			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where "+keyName+"='"+key+"'";
+			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where ("+keyName+")=('"+key+"')";
 			PreparedStatement stmt = connection.prepareStatement(query);
 			stmt.executeUpdate();
 			stmt.close();
@@ -268,19 +353,7 @@ public class DatabaseHandler {
 	public static void deleteData(String tabelle, String keyName, String key) {
 		
 		try {
-			String query = "DELETE FROM "+tabelle+" WHERE "+keyName+" = '"+key+"'";
-			PreparedStatement stmt = connection.prepareStatement(query);
-			stmt.executeUpdate();
-			stmt.close();
-		} catch (SQLException error) {
-			error.printStackTrace();
-		}
-		
-	}
-	public static void deleteData(String tabelle, String keyName1, String key1, String keyName2, String key2) {
-		
-		try {
-			String query = "DELETE FROM "+tabelle+" WHERE "+keyName1+" = '"+key1+"' AND "+keyName2+" = '"+key2+"'";
+			String query = "DELETE FROM "+tabelle+" WHERE ("+keyName+")=('"+key+"')";
 			PreparedStatement stmt = connection.prepareStatement(query);
 			stmt.executeUpdate();
 			stmt.close();

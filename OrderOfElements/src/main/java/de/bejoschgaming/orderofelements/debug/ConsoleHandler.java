@@ -7,6 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.bejoschgaming.orderofelements.main.OOE_Main_Server;
+import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
 import de.bejoschgaming.orderofelements.session.ClientSession;
 import de.bejoschgaming.orderofelements.session.SessionHandler;
 
@@ -101,6 +102,9 @@ public class ConsoleHandler {
 							case "/sessions":
 								sendCommand_sessions(inputs);
 								break;
+							case "/reloadMaps":
+								sendCommand_reloadMaps(inputs);
+								break;
 							/*case "/game":
 								sendCommand_game(inputs);
 								break;
@@ -170,6 +174,7 @@ public class ConsoleHandler {
 		printMessageInConsole("'/overview ' - Gives a general overview about everything interessting", true);
 		printMessageInConsole("'/session [id|name] ' - Gives info about the session", true);
 		printMessageInConsole("'/sessions ([start] [end]) ' - Shows the list of connected sessions", true);
+		printMessageInConsole("'/reloadMaps ' - Reloads all maps from the db", true);
 		/*printMessageInConsole("'/game [id] ' - Join the game session so you see the log of the game", true);
 		printMessageInConsole("'/games [quantity] ' - Shows the list of running games", true);
 		printMessageInConsole("'/groups [quantity] ' - Shows the list of active groups", true);
@@ -268,6 +273,13 @@ public class ConsoleHandler {
 		
 	}
 
+	private static void sendCommand_reloadMaps(List<String> inputs) {
+		
+		MapHandler.loadMapsFromDB();
+		printMessageInConsole("Loaded "+MapHandler.getLoadedMaps().size()+" maps from DB on manuell reload!", true);
+		
+	}
+	
 	
 	private static void sendCommand_stop(List<String> inputs) {
 		
