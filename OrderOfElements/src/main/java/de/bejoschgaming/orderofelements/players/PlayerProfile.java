@@ -37,6 +37,7 @@ public class PlayerProfile {
 		loadDecks();
 		loadFriendRequests();
 		loadFriendList();
+		sendOnlineInfoToFriends();
 		
 	}
 	
@@ -44,16 +45,21 @@ public class PlayerProfile {
 		this.decks = DeckHandler.getDecks(this.ID);
 	}
 	public void loadFriendRequests() {
+		this.friendRequests.clear();
 		//ALLE REQUESTS (ID1) WO DIESE ID DAS ZIEL (ID2) IST
 		this.friendRequests = DatabaseHandler.getAllWhereEqual_Int(DatabaseHandler.tabellName_friendRequests, "ID1", "ID2", ""+this.ID);
 	}
 	public void loadFriendList() {
+		this.friendList.clear();
 		//ALLE IDs (ID2) DIE DIESE ID (ID1) HABEN
 		List<Integer> friendListIDs = DatabaseHandler.getAllWhereEqual_Int(DatabaseHandler.tabellName_friendList, "ID2", "ID1", ""+this.ID);
 		for(int friendID : friendListIDs) {
 			String date = DatabaseHandler.selectString(DatabaseHandler.tabellName_friendList, "Datum", "ID1,ID2", this.ID+"','"+friendID);
 			this.friendList.put(friendID, date);
 		}
+	}
+	
+	private void sendOnlineInfoToFriends() {
 		//SEND ONLINE INFO TO ALL FRIENDS WHICH ARE ONLINE
 		for(int friendID : this.friendList.keySet()) {
 			ClientSession friendSession = SessionHandler.getSession(friendID);
@@ -63,7 +69,6 @@ public class PlayerProfile {
 			}
 		}
 	}
-	
 	public void disconnect() {
 		
 		//SEND OFFLINE INFO TO ALL FRIENDS WHICH ARE ONLINE

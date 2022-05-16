@@ -1,5 +1,6 @@
 package de.bejoschgaming.orderofelements.connection;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -93,7 +94,11 @@ public class ClientConnection {
 			if(deckID == -1) {
 				//NEW DECK
 				int ownerID = this.clientSession.getProfile().getID();
-				DatabaseHandler.insertData(DatabaseHandler.tabellName_decks, "OwnerID,Name,Data", ownerID+","+deckName+","+deckData);
+				try {
+					DatabaseHandler.insertData(DatabaseHandler.tabellName_decks, "OwnerID,Name,Data", ownerID+"','"+deckName+"','"+deckData);
+				} catch (SQLException error) {
+					break; //ALREADY DECK THERE
+				}
 			}else {
 				//UPDATE EXISTING DECK
 				DatabaseHandler.updateString(DatabaseHandler.tabellName_decks, "Name", deckName, "ID", ""+deckID);
@@ -119,28 +124,75 @@ public class ClientConnection {
 			}
 			break;
 		case 241:
-			//FRIENDREQUEST ACCEPT
-			//SYNTAX: 241-acceptedID
-			//TODO remove and add db entries and reload profile friendlist
+			//FRIENDREQUEST ADD
+			//SYNTAX: 241-youWantToAddID
+			int newFriendTargetID = Integer.parseInt(message);
+			try {
+				DatabaseHandler.insertData(DatabaseHandler.tabellName_friendRequests, "ID1,ID2", clientSession.getProfile().getID()+"','"+newFriendTargetID);
+			} catch (SQLException error) {
+				break; //ALREADY REQUEST THERE
+			}
+			ClientSession friendTargetSession = SessionHandler.getSession(newFriendTargetID);
+			if(friendTargetSession != null) {
+				//TARGET IS CONNECTED
+				friendTargetSession.getProfile().loadFriendRequests();
+				friendTargetSession.sendPacket(240, clientSession.getProfile().getID()+";"+clientSession.getProfile().getName());
+			}
 			break;
 		case 242:
+			//FRIENDREQUEST ACCEPT
+			//SYNTAX: 242-acceptedID
+			int acceptedID = Integer.parseInt(message);
+			DatabaseHandler.deleteData(DatabaseHandler.tabellName_friendRequests, "ID1,ID2", acceptedID+"','"+clientSession.getProfile().getID());
+			DatabaseHandler.registerNewFriendship(acceptedID, clientSession.getProfile().getID());
+			clientSession.getProfile().loadFriendRequests();
+			clientSession.getProfile().loadFriendList();
+			String friendshipDate = DatabaseHandler.selectString(DatabaseHandler.tabellName_friendList, "Datum", "ID1,ID2", acceptedID+"','"+clientSession.getProfile().getID());
+			clientSession.sendPacket(245, acceptedID+";"+friendshipDate);
+			ClientSession friendSession = SessionHandler.getSession(acceptedID);
+			if(friendSession != null) {
+				//FRIEND IS ONLINE
+				clientSession.sendPacket(205, ""+acceptedID);
+				friendSession.sendPacket(245, clientSession.getProfile().getID()+";"+friendshipDate);
+				friendSession.sendPacket(205, ""+clientSession.getProfile().getID());
+			}
+			break;
+		case 243:
 			//FRIENDREQUEST DECLINE
-			//SYNTAX: 242-deniedID
-			//TODO remove db entry
+			//SYNTAX: 243-deniedID
+			int deniedID = Integer.parseInt(message);
+			DatabaseHandler.deleteData(DatabaseHandler.tabellName_friendRequests, "ID1,ID2", deniedID+"','"+clientSession.getProfile().getID());
+			clientSession.getProfile().loadFriendRequests();
 			break;
 		case 245:
 			//FRIENDLIST SEND REQUEST
 			//SYNTAX: 245-
+			//Send all friendships...
 			for(int friendID : this.clientSession.getProfile().getFriendList().keySet()) {
 				//245-friendID;friendshipStartDate
 				String friendDate = this.clientSession.getProfile().getFriendList().get(friendID);
 				sendPacket(245, friendID+";"+friendDate);
 			}
+			//...and then who is online atm
+			for(int friendID : this.clientSession.getProfile().getFriendList().keySet()) {
+				if(SessionHandler.isSessionConnected(friendID)) {
+					//FRIEND IS CONNECTED
+					sendPacket(205, ""+friendID);
+				}
+			}
 			break;
 		case 246:
 			//FRIEND REMOVE
-			//SYNTAX: 246-removedFriendID
-			//TODO
+			//SYNTAX: 246-removeFriendID
+			int removeID = Integer.parseInt(message);
+			DatabaseHandler.unregisterFriendship(removeID, clientSession.getProfile().getID());
+			clientSession.getProfile().loadFriendList();
+			ClientSession friendRemoveSession = SessionHandler.getSession(removeID);
+			if(friendRemoveSession != null) {
+				//FRIEND TO REMOVE IS ONLINE, so inform about remove
+				friendRemoveSession.sendPacket(246, ""+clientSession.getProfile().getID());
+				friendRemoveSession.getProfile().loadFriendList();
+			}
 			break;
 		}
 		

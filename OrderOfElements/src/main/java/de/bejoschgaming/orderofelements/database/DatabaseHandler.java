@@ -275,10 +275,7 @@ public class DatabaseHandler {
 			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 			messageDigest.update(password.getBytes());
 			String passwordHash = new String(messageDigest.digest());
-			String query = "INSERT INTO "+tabellName_profile+" (Name,Datum,Password) VALUES ('"+name+"','"+date+"','"+passwordHash+"')";
-			PreparedStatement stmt = connection.prepareStatement(query);
-			stmt.executeUpdate();
-			stmt.close();
+			DatabaseHandler.insertData(DatabaseHandler.tabellName_profile, "Name,Datum,Password", name+"','"+date+"','"+passwordHash);
 			return true;
 		} catch (SQLException error) {
 //			error.printStackTrace(); //SOMETIMES SHOULD BE THROWN AS CHECK FOR DUPLICATE ENTRY (REGISTER NAME AS EXAMPLE)
@@ -290,22 +287,41 @@ public class DatabaseHandler {
 		
 	}
 	
+	public static boolean registerNewFriendship(int id1, int id2) {
+		
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europa/Berlin"));
+		String date = doubleWriteNumber(cal.get(Calendar.DAY_OF_MONTH))+"_"+doubleWriteNumber(cal.get(Calendar.MONTH)+1)+"_"+doubleWriteNumber(cal.get(Calendar.YEAR));
+		
+		try {
+			DatabaseHandler.insertData(DatabaseHandler.tabellName_friendList, "ID1,ID2,Datum", id1+","+id2+","+date);
+			DatabaseHandler.insertData(DatabaseHandler.tabellName_friendList, "ID1,ID2,Datum", id2+","+id1+","+date);
+		} catch (SQLException error) {
+			return false;
+		}
+		
+		return true;
+	}
+	public static boolean unregisterFriendship(int id1, int id2) {
+		
+		DatabaseHandler.deleteData(DatabaseHandler.tabellName_friendList, "ID1,ID2", id1+"','"+id2);
+		DatabaseHandler.deleteData(DatabaseHandler.tabellName_friendList, "ID1,ID2", id2+"','"+id1);
+		
+		return true;
+	}
+	
 	/**
 	 * Insert data
 	 * @param tabelle - Table name
 	 * @param vars - The variables WITHOUT BRACKETS! - Like this: Name,ID,Datum,Password
 	 * @param values - The values WITHOUT BRACKETS! - Like this: 'BEJOSCH','1234','01_02_2000','abcba'
+	 * @throws SQLException 
 	 */
-	public static void insertData(String tabelle, String vars, String values) {
+	public static void insertData(String tabelle, String vars, String values) throws SQLException {
 		
-		try {
-			String query = "INSERT INTO "+tabelle+" ("+vars+") VALUES ("+values+")";
-			PreparedStatement stmt = connection.prepareStatement(query);
-			stmt.executeUpdate();
-			stmt.close();
-		} catch (SQLException error) {
-			error.printStackTrace();
-		}
+		String query = "INSERT INTO "+tabelle+" ("+vars+") VALUES ('"+values+"')";
+		PreparedStatement stmt = connection.prepareStatement(query);
+		stmt.executeUpdate();
+		stmt.close();
 		
 	}
 	
