@@ -1,4 +1,4 @@
-package de.bejoschgaming.orderofelements.session;
+package de.bejoschgaming.orderofelements.sessionsystem;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

@@ -8,7 +8,7 @@ import de.bejoschgaming.orderofelements.database.DatabaseHandler;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 import de.bejoschgaming.orderofelements.filesystem.FileHandler;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
-import de.bejoschgaming.orderofelements.session.SessionHandler;
+import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
 
 public class OOE_Main_Server {
 

@@ -1,4 +1,4 @@
-package de.bejoschgaming.orderofelements.players;
+package de.bejoschgaming.orderofelements.playersystem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,14 +8,16 @@ import java.util.List;
 import de.bejoschgaming.orderofelements.database.DatabaseHandler;
 import de.bejoschgaming.orderofelements.decksystem.Deck;
 import de.bejoschgaming.orderofelements.decksystem.DeckHandler;
-import de.bejoschgaming.orderofelements.session.ClientSession;
-import de.bejoschgaming.orderofelements.session.SessionHandler;
+import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
+import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
 
 public class PlayerProfile {
 
 	private ClientSession clientSession;
 	private int ID;
 	private String name;
+	private RankingType ranking;
+	private int rankingPoints;
 	
 	private List<Deck> decks = new LinkedList<Deck>();
 	private List<Integer> friendRequests = new ArrayList<>();
@@ -27,6 +29,9 @@ public class PlayerProfile {
 		this.clientSession = clientSession;
 		this.ID = playerID;
 		this.name = playerName;
+		
+		this.ranking = RankingType.IRON; //TODO LOAD FROM STATS DB
+		this.rankingPoints = 0; //TODO LOAD FROM STATS DB
 		
 		loadPlayerData();
 		
@@ -99,6 +104,12 @@ public class PlayerProfile {
 	}
 	public HashMap<Integer, String> getFriendList() {
 		return friendList;
+	}
+	public RankingType getRanking() {
+		return ranking;
+	}
+	public int getRankingPoints() {
+		return rankingPoints;
 	}
 	
 }

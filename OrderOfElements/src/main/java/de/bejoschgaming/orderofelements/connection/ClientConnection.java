@@ -12,8 +12,8 @@ import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 import de.bejoschgaming.orderofelements.decksystem.Deck;
 import de.bejoschgaming.orderofelements.mapsystem.Map;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
-import de.bejoschgaming.orderofelements.session.ClientSession;
-import de.bejoschgaming.orderofelements.session.SessionHandler;
+import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
+import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
 
 public class ClientConnection {
 

@@ -8,8 +8,8 @@ import java.util.TimerTask;
 
 import de.bejoschgaming.orderofelements.main.OOE_Main_Server;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
-import de.bejoschgaming.orderofelements.session.ClientSession;
-import de.bejoschgaming.orderofelements.session.SessionHandler;
+import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
+import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
 
 public class ConsoleHandler {
 

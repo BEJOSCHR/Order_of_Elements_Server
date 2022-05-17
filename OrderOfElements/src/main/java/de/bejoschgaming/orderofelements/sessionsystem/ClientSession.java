@@ -1,11 +1,11 @@
-package de.bejoschgaming.orderofelements.session;
+package de.bejoschgaming.orderofelements.sessionsystem;
 
 import java.util.Random;
 
 import de.bejoschgaming.orderofelements.connection.ClientConnection;
 import de.bejoschgaming.orderofelements.connection.ConnectionHandler;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
-import de.bejoschgaming.orderofelements.players.PlayerProfile;
+import de.bejoschgaming.orderofelements.playersystem.PlayerProfile;
 
 public class ClientSession {
 
