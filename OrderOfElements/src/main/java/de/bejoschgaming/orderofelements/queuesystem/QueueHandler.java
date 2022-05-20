@@ -3,6 +3,8 @@ package de.bejoschgaming.orderofelements.queuesystem;
 import java.util.ArrayList;
 
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
+import de.bejoschgaming.orderofelements.gamesystem.GameHandler;
+import de.bejoschgaming.orderofelements.gamesystem.GameType;
 import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
 import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
 
@@ -32,7 +34,8 @@ public class QueueHandler {
 						if(rankingPointDifferenz >= -normalQueue_rankingPointsDifferenz && rankingPointDifferenz <= normalQueue_rankingPointsDifferenz) {
 							//RANKING POINTS FIT
 							
-							
+							//CREATE GAME
+							GameHandler.registerNewGame(session1, session2, GameType.NORMAL);
 							
 							ConsoleHandler.printMessageInConsole("Matched "+session1.getProfile().getName()+" ("+session1.getProfile().getRanking()+"-"+session1.getProfile().getRankingPoints()+") with "+session2.getProfile().getName()+" ("+session2.getProfile().getRanking()+"-"+session2.getProfile().getRankingPoints()+") in queue "+type+"!", true);
 							return;
@@ -51,7 +54,8 @@ public class QueueHandler {
 						if(rankingPointDifferenz >= -rankedQueue_rankingPointsDifferenz && rankingPointDifferenz <= rankedQueue_rankingPointsDifferenz) {
 							//RANKING POINTS FIT
 							
-							
+							//CREATE GAME
+							GameHandler.registerNewGame(session1, session2, GameType.RANKED);
 							
 							ConsoleHandler.printMessageInConsole("Matched "+session1.getProfile().getName()+" ("+session1.getProfile().getRanking()+"-"+session1.getProfile().getRankingPoints()+") with "+session2.getProfile().getName()+" ("+session2.getProfile().getRanking()+"-"+session2.getProfile().getRankingPoints()+") in queue "+type+"!", true);
 							return;
@@ -70,7 +74,8 @@ public class QueueHandler {
 						if(rankingPointDifferenz >= -spezialQueue_rankingPointsDifferenz && rankingPointDifferenz <= spezialQueue_rankingPointsDifferenz) {
 							//RANKING POINTS FIT
 							
-							
+							//CREATE GAME
+							GameHandler.registerNewGame(session1, session2, GameType.SPEZIAL);
 							
 							ConsoleHandler.printMessageInConsole("Matched "+session1.getProfile().getName()+" ("+session1.getProfile().getRanking()+"-"+session1.getProfile().getRankingPoints()+") with "+session2.getProfile().getName()+" ("+session2.getProfile().getRanking()+"-"+session2.getProfile().getRankingPoints()+") in queue "+type+"!", true);
 							return;
@@ -104,10 +109,10 @@ public class QueueHandler {
 		
 	}
 	
-	public static boolean removeFromQueues(ClientSession session, QueueType type) {
-		return removeFromQueues(session.getSessionID(), type);
+	public static boolean removeFromQueue(ClientSession session, QueueType type) {
+		return removeFromQueue(session.getSessionID(), type);
 	}
-	public static boolean removeFromQueues(int playerID, QueueType type) {
+	public static boolean removeFromQueue(int playerID, QueueType type) {
 		
 		switch (type) {
 		case NORMAL:

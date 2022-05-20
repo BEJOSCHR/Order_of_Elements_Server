@@ -12,6 +12,8 @@ import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 import de.bejoschgaming.orderofelements.decksystem.Deck;
 import de.bejoschgaming.orderofelements.mapsystem.Map;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
+import de.bejoschgaming.orderofelements.queuesystem.QueueHandler;
+import de.bejoschgaming.orderofelements.queuesystem.QueueType;
 import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
 import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
 
@@ -194,6 +196,33 @@ public class ClientConnection {
 				friendRemoveSession.getProfile().loadFriendList();
 			}
 			break;
+		case 300:
+			//JOIN QUEUE
+			//SYNTAX: 300-queueType (ENUM!)
+			QueueType queueType_Join = QueueType.valueOf(message);
+			QueueHandler.addToQueue(clientSession, queueType_Join);
+			break;
+		case 301:
+			//LEAVE QUEUE
+			//SYNTAX: 301-queueType (ENUM!)
+			QueueType queueType_Leave = QueueType.valueOf(message);
+			QueueHandler.removeFromQueue(clientSession, queueType_Leave);
+			break;
+		case 310:
+			//ACCEPT GAME
+			//SYNTAX: 310-gameID
+			int gameAccept_gameID = Integer.parseInt(message);
+			//TODO
+			break;
+		case 311:
+			//DECLINE GAME
+			//SYNTAX: 311-gameID
+			int gameDecline_gameID = Integer.parseInt(message);
+			//TODO
+			break;
+			
+			
+			
 		}
 		
 	}
