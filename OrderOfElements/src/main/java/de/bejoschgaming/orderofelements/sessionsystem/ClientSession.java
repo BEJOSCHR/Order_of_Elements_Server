@@ -44,7 +44,9 @@ public class ClientSession {
 		boolean worked = SessionHandler.unregisterSession(this);
 		if(worked) {
 			//ONLY DISCONNECT IF UNREGISTER WORKED
-			profile.disconnect();
+			if(this.profileLoaded) {
+				profile.disconnect();
+			}
 			connection.disconnect();
 		}
 		

@@ -164,6 +164,10 @@ public class Game {
 		
 	}
 	
+	public String getShortInfo() {
+		return "ID: "+this.getGameID()+" - Type: "+this.getType()+" - "+player1.getProfile().getName()+" vs "+player2.getProfile().getName()+" - Started: "+this.hasGameStarted()+" - ActivePlayer: "+this.getActivePlayerNumber()+" - Round: "+this.getRound()+" - Turn: "+this.getTurn()+" - Specs: "+this.spectators.size();
+	}
+	
 	public int getGameID() {
 		if(gameStarted == true) {
 			return gameID;

@@ -6,6 +6,8 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import de.bejoschgaming.orderofelements.gamesystem.Game;
+import de.bejoschgaming.orderofelements.gamesystem.GameHandler;
 import de.bejoschgaming.orderofelements.main.OOE_Main_Server;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
 import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
@@ -76,7 +78,7 @@ public class ConsoleHandler {
 								printMessageInConsole("Terminated packets session", true);
 							}else {
 								//GAME
-								printMessageInConsole("Terminated game session for game ["+oldID+"]", true);
+								printMessageInConsole("Terminated game session for id ["+oldID+"]", true);
 							}
 							printBlankLineInConsole();
 							
@@ -105,16 +107,13 @@ public class ConsoleHandler {
 							case "/reloadMaps":
 								sendCommand_reloadMaps(inputs);
 								break;
-							/*case "/game":
+							case "/game":
 								sendCommand_game(inputs);
 								break;
 							case "/games":
 								sendCommand_games(inputs);
 								break;
-							case "/groups":
-								sendCommand_groups(inputs);
-								break;
-							case "/update":
+							/*case "/update":
 								sendCommand_update(inputs);
 								break;*/
 							case "/stop":
@@ -175,10 +174,9 @@ public class ConsoleHandler {
 		printMessageInConsole("'/session [id|name] ' - Gives info about the session", true);
 		printMessageInConsole("'/sessions ([start] [end]) ' - Shows the list of connected sessions", true);
 		printMessageInConsole("'/reloadMaps ' - Reloads all maps from the db", true);
-		/*printMessageInConsole("'/game [id] ' - Join the game session so you see the log of the game", true);
-		printMessageInConsole("'/games [quantity] ' - Shows the list of running games", true);
-		printMessageInConsole("'/groups [quantity] ' - Shows the list of active groups", true);
-		printMessageInConsole("'/update [units|upgrades] ' - Reloads the units or the upgrades from the DB", true); */
+		printMessageInConsole("'/game [id] ' - Join the game session so you see the log of the game", true);
+		printMessageInConsole("'/games ([start] [end]) ' - Shows the list of running games", true);
+		/*printMessageInConsole("'/update [units|upgrades] ' - Reloads the units or the upgrades from the DB", true); */
 		printMessageInConsole("'/stop ' - Stoppes the whole server", true);
 		
 	}
@@ -186,7 +184,7 @@ public class ConsoleHandler {
 	private static void sendCommand_overview(List<String> inputs) {
 		
 		printMessageInConsole("Running OrderOfElements-Server since "+(System.currentTimeMillis()-OOE_Main_Server.startMillis)/1000/60+" min", true);
-		printMessageInConsole("Running games: "+-1, true);
+		printMessageInConsole("Running games: "+GameHandler.getRunningGames().size(), true);
 		printMessageInConsole("Connected sessions: "+SessionHandler.numberOfConnectedSessions(), true);
 		int sendPackets = 0;
 		for(ClientSession session : SessionHandler.getConnectedSessions()) {
@@ -273,6 +271,68 @@ public class ConsoleHandler {
 		
 	}
 
+	private static void sendCommand_game(List<String> inputs) {
+		
+		if(inputs.size() >= 2) {
+			try {
+				int gameID = Integer.parseInt(inputs.get(1));
+				if(GameHandler.getGame(gameID) != null) {
+					printBlankLineInConsole();
+					printMessageInConsole("Joined game session for id ["+gameID+"]", true);
+					printBlankLineInConsole();
+					focusDebugID = gameID;
+				}else {
+					printMessageInConsole("There is no running game for id: "+gameID+"!", true);
+				}
+			}catch(NumberFormatException error) {
+				printMessageInConsole(inputs.get(0)+" is not a valid number!", true);
+			}
+		}else {
+			printMessageInConsole("/game [id] ", true);
+		}
+		
+	}
+	
+	private static void sendCommand_games(List<String> inputs) {
+		
+		if(GameHandler.getRunningGames().isEmpty()) {
+			//EMPTY
+			printMessageInConsole("There are no running games at the moment!", true);
+			return;
+		}
+		
+		if(inputs.size() >= 3) {
+			//HAS NUMBER
+			try {
+				int start = Integer.parseInt(inputs.get(1));
+				int end = Integer.parseInt(inputs.get(2));
+				start = ( start > 0 ? start : 1 );
+				start = ( GameHandler.getRunningGames().size() >= start ? start : GameHandler.getRunningGames().size() );
+				end = ( end > 0 ? end : 1 );
+				end = ( GameHandler.getRunningGames().size() >= end ? end : GameHandler.getRunningGames().size() );
+				if(start > end) { ConsoleHandler.printMessageInConsole("Invalid argument! ["+start+">"+end+"]", true); return; }
+				printMessageInConsole("Showing "+start+" to "+end+" from max. "+GameHandler.getRunningGames()+" running games:", true);
+				for(int i = start ; i <= end ; i++) {
+					Game game = GameHandler.getRunningGames().get(i);
+					printMessageInConsole(i+". "+game.getShortInfo(), true);
+				}
+			}catch(NumberFormatException error) {
+				printMessageInConsole("/sessions or /sessions [start] [end]", true);
+			}
+		}else { 
+			//NO NUMBER
+			int start = 1;
+			int end = 10;
+			end = ( GameHandler.getRunningGames().size() >= end ? end : GameHandler.getRunningGames().size() );
+			printMessageInConsole("Showing "+start+" to "+end+" from max. "+GameHandler.getRunningGames().size()+" running games:", true);
+			for(int i = start ; i <= end ; i++) {
+				Game game = GameHandler.getRunningGames().get(i);
+				printMessageInConsole(i+". "+game.getShortInfo(), true);
+			}
+		}
+		
+	}
+	
 	private static void sendCommand_reloadMaps(List<String> inputs) {
 		
 		MapHandler.loadMapsFromDB();
