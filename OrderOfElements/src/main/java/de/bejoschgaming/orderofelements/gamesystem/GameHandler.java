@@ -25,13 +25,20 @@ public class GameHandler {
 	public static void unregisterGame(Game game) {
 		
 		runningGames.remove(game);
-		ConsoleHandler.printMessageInConsole("Removed game "+game.getGameID()+"-"+game.getType()+": "+game.getPlayer1().getProfile().getName()+" vs "+game.getPlayer2().getProfile().getName(), true);
 		
 	}
 	
 	public static Game getGame(int gameID) {
 		for(Game game : runningGames) {
 			if(game.getGameID() == gameID) {
+				return game;
+			}
+		}
+		return null;
+	}
+	public static Game getGame(ClientSession session) {
+		for(Game game : runningGames) {
+			if(game.containsPlayer(session)) {
 				return game;
 			}
 		}

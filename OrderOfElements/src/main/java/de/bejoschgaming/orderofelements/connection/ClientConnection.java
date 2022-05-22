@@ -10,10 +10,14 @@ import org.apache.mina.core.session.IoSession;
 import de.bejoschgaming.orderofelements.database.DatabaseHandler;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 import de.bejoschgaming.orderofelements.decksystem.Deck;
+import de.bejoschgaming.orderofelements.gamesystem.GameHandler;
 import de.bejoschgaming.orderofelements.mapsystem.Map;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
 import de.bejoschgaming.orderofelements.queuesystem.QueueHandler;
 import de.bejoschgaming.orderofelements.queuesystem.QueueType;
+import de.bejoschgaming.orderofelements.replaysystem.GameAction;
+import de.bejoschgaming.orderofelements.replaysystem.GameActionType;
+import de.bejoschgaming.orderofelements.replaysystem.Replay;
 import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
 import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
 
@@ -196,6 +200,22 @@ public class ClientConnection {
 				friendRemoveSession.getProfile().loadFriendList();
 			}
 			break;
+		case 260:
+			//REQUEST REPLAY DATA
+			//SYNTAX: 260-gameID
+			int replayLoad_gameID = Integer.parseInt(message);
+			Replay replay = new Replay(replayLoad_gameID);
+			replay.loadReplayData();
+			for(GameAction action : replay.getActions()) {
+				//SYNTAX: 260-GameID;Round;Turn;Type;Data
+				clientSession.sendPacket(260, action.getGameID()+";"+action.getRound()+";"+action.getTurn()+";"+action.getType()+";"+action.getData());
+			}
+			clientSession.sendPacket(261, replayLoad_gameID+";"+replay.getActions().size());
+			break;
+		case 261:
+			//ONLY SEND: FINISHED SENDING ALL REPLAY DATA FOR THIS GAME
+			//SYNTAX: 261-gameID;amountOfActions
+			break;
 		case 300:
 			//JOIN QUEUE
 			//SYNTAX: 300-queueType (ENUM!)
@@ -220,8 +240,37 @@ public class ClientConnection {
 			int gameDecline_gameID = Integer.parseInt(message);
 			//TODO
 			break;
-			
-			
+		case 500:
+			//ONLY SEND: GAME START
+			//SYNTAX: 500-gameID;playerID_1;playerID_2;MapName
+			break;
+		case 501:
+			//NEXT TURN
+			//SYNTAX: 501-gameID
+			int gameID_1 = Integer.parseInt(message);
+			GameHandler.getGame(gameID_1).nextTurn();
+			break;
+		case 502:
+			//NEXT ROUND
+			//SYNTAX: 503-gameID
+			int gameID_2 = Integer.parseInt(message);
+			GameHandler.getGame(gameID_2).nextRound();
+			break;
+		case 503:
+			//PERFORM ACTION
+			//SYNTAX: 503-gameID;ActionType (ENUM!);ActionData
+			int gameID_3 = Integer.parseInt(data[0]);
+			GameActionType actionType = GameActionType.valueOf(data[1]);
+			String actionData = data[2];
+			GameHandler.getGame(gameID_3).performAction(actionType, actionData);
+			break;
+		case 510:
+			//GAME FINISH (SURRENDER)
+			//SYNTAX: 510-gameID;cause
+			int gameID_10 = Integer.parseInt(data[0]);
+			String finishCause = data[1];
+			//TODO
+			break;
 			
 		}
 		

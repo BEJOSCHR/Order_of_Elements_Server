@@ -29,8 +29,10 @@ public class DatabaseHandler {
 	private static Timer keepConnectionTimer = null;
 
 	public static final String tabellName_profile = "Profile";
+	public static final String tabellName_games = "Games";
 	public static final String tabellName_decks = "Decks";
 	public static final String tabellName_maps = "Maps";
+	public static final String tabellName_replays = "Replaydata";
 	public static final String tabellName_stats = "Stats";
 	public static final String tabellName_friendList = "FriendList";
 	public static final String tabellName_friendRequests = "FriendRequests";
@@ -389,5 +391,8 @@ public class DatabaseHandler {
 		
 	}
 
+	public static Connection getConnection() {
+		return connection;
+	}
 	
 }

@@ -8,4 +8,10 @@ public class CustomGame extends Game {
 		super(player1, player2, GameType.CUSTOM);
 	}
 
+	public void manuallyStartGame() {
+		
+		this.startGame();
+		
+	}
+	
 }
