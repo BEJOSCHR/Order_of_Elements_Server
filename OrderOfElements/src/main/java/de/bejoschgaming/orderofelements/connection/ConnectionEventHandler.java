@@ -4,8 +4,8 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 
-import de.bejoschgaming.orderofelements.session.ClientSession;
-import de.bejoschgaming.orderofelements.session.SessionHandler;
+import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
+import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
 
 public class ConnectionEventHandler extends IoHandlerAdapter {
 

@@ -7,7 +7,8 @@ import de.bejoschgaming.orderofelements.connection.ConnectionHandler;
 import de.bejoschgaming.orderofelements.database.DatabaseHandler;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 import de.bejoschgaming.orderofelements.filesystem.FileHandler;
-import de.bejoschgaming.orderofelements.session.SessionHandler;
+import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
+import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
 
 public class OOE_Main_Server {
 
@@ -24,6 +25,9 @@ public class OOE_Main_Server {
 		DatabaseHandler.connectToDB();
 		
 		ConnectionHandler.startServerConnection();
+		
+		MapHandler.loadMapsFromDB();
+		ConsoleHandler.printMessageInConsole("Loaded "+MapHandler.getLoadedMaps().size()+" maps from DB!", true);
 		
 		startMillis = System.currentTimeMillis();
 		ConsoleHandler.printMessageInConsole("Startup finished!", true);

@@ -1,4 +1,4 @@
-package de.bejoschgaming.orderofelements.session;
+package de.bejoschgaming.orderofelements.sessionsystem;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -7,11 +7,9 @@ import java.util.List;
 
 import org.apache.mina.core.session.IoSession;
 
-import de.bejoschgaming.orderofelements.connection.ClientConnection;
 import de.bejoschgaming.orderofelements.database.DatabaseHandler;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 import de.bejoschgaming.orderofelements.filesystem.FileHandler;
-import de.bejoschgaming.orderofelements.players.PlayerProfile;
 
 public class SessionHandler {
 
@@ -149,30 +147,6 @@ public class SessionHandler {
 		
 	}
 	public static boolean isSessionConnected(String name) { return getSession(name) != null;	}
-	//---
-	public static ClientSession getSession(PlayerProfile profile) {
-		
-		for(ClientSession session : connectedSessions) {
-			if(session.isProfileLoaded() && session.getProfile().getID() == profile.getID()) {
-				return session;
-			}
-		}
-		return null;
-		
-	}
-	public static boolean isSessionConnected(PlayerProfile profile) { return getSession(profile) != null;	}
-	//---
-	public static ClientSession getSession(ClientConnection connection) {
-		
-		for(ClientSession session : connectedSessions) {
-			if(session.getConnection().getID() == connection.getID()) {
-				return session;
-			}
-		}
-		return null;
-		
-	}
-	public static boolean isSessionConnected(ClientConnection connection) { return getSession(connection) != null;	}
 	//---
 	
 	public static List<ClientSession> getConnectedSessions() {
