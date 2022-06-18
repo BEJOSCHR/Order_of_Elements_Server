@@ -90,6 +90,34 @@ public class SessionHandler {
 		
 	}
 	
+	/**
+	 * Null as result means the login data is free for register and valid
+	 * @param name
+	 * @param password
+	 * @return null if all is good, else the cause for failure as String
+	 */
+	public static String checkRegisterData(String name, String password) {
+		
+		if(DatabaseHandler.connectedToDB) {
+			//CHECK VIA DB
+			
+			String selectedPW = DatabaseHandler.selectString(DatabaseHandler.tabellName_profile, "Password", "Name", name);
+			if(selectedPW == null) {
+				//NO ENTRY FOUND AT ALL, so valid for register
+				return null;
+			}else {
+				return "Username already used!";
+			}
+			
+		}else {
+			//USE BACKUP FILE
+			
+			return "Server error #001, please try again later!";
+			
+		}
+		
+	}
+	
 	public static void disconnectAllSessions() {
 		
 		while(connectedSessions.isEmpty() == false) {

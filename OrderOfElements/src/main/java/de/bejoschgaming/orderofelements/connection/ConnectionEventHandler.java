@@ -33,16 +33,18 @@ public class ConnectionEventHandler extends IoHandlerAdapter {
 	}
 	
     @Override
-    public void messageReceived(IoSession session, Object messageReceived) throws Exception {
-        
+    public void messageReceived(IoSession session, Object messageReceived) {
+    	
     	String rawMessage = messageReceived.toString();
     	String[] splitMessage = rawMessage.split(ConnectionHandler.packetDivider);
         int signal = Integer.parseInt(splitMessage[0]);
         String message = splitMessage[1];
-    	
+        
     	ClientSession clientSession = SessionHandler.getSession(session);
     	clientSession.getConnection().handlePacket(clientSession, signal, message);
-        
+    	
+    	//DONT DO ANYTHING AFTER THE HANDLE PART -> IT sometimes FREEZES THE THREAD OR STH SO IT NEVER RETURNS HERE
+    	
     }
     
     @Override

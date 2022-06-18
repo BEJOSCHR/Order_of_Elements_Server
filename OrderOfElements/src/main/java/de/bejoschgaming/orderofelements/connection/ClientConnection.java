@@ -45,7 +45,11 @@ public class ClientConnection {
 	
 	public void handlePacket(ClientSession clientSession, int signal, String message) {
 		
-		ConsoleHandler.printMessageInConsole(0, "["+clientSession.getProfile().getName()+"-"+clientSession.getSessionID()+"] "+signal+" - "+message, true);
+		if(clientSession.isProfileLoaded()) {
+			ConsoleHandler.printMessageInConsole(0, "["+clientSession.getProfile().getName()+"-"+clientSession.getSessionID()+"] "+signal+" - "+message, true);
+		}else {
+			ConsoleHandler.printMessageInConsole(0, "[NoLogin-"+clientSession.getSessionID()+"] "+signal+" - "+message, true);
+		}
 		String[] data = message.split(";");
 		
 		//SERVER recieve
@@ -53,20 +57,36 @@ public class ClientConnection {
 		case 100:
 			//LOGIN
 			//SYNTAX: 100-Name;Password
-			String name = data[0];
-			String password = data[1];
-			boolean correctData = SessionHandler.checkLoginData(name, password);
-			if(correctData) {
-				int playerID;
+			String login_name = data[0];
+			String login_password = data[1];
+			boolean login_correctData = SessionHandler.checkLoginData(login_name, login_password);
+			if(login_correctData) {
+				int login_playerID;
 				if(DatabaseHandler.connectedToDB) {
-					playerID = DatabaseHandler.selectInt(DatabaseHandler.tabellName_profile, "ID", "Name", name);
+					login_playerID = DatabaseHandler.selectInt(DatabaseHandler.tabellName_profile, "ID", "Name", login_name);
 				}else {
-					playerID = new Random().nextInt(99)+1;
+					login_playerID = new Random().nextInt(99)+1;
 				}
-				clientSession.login(playerID, name);
-				clientSession.sendPacket(100, playerID+";"+"Successfully logged in!");
+				clientSession.login(login_playerID, login_name);
+				clientSession.sendPacket(100, login_playerID+";"+"Successfully logged in!");
 			}else {
 				clientSession.sendPacket(101, "Wrong username or password!");
+			}
+			break;
+		case 101:
+			//REGISTER
+			//SYNTAX: 101-Name;Password
+			String register_name = data[0];
+			String register_password = data[1];
+			String register_failureCause = SessionHandler.checkRegisterData(register_name, register_password);
+			if(register_failureCause == null) {
+				DatabaseHandler.insertNewPlayer(register_name, register_password);
+				//DB CON HAS TO BE ESTABLISHED, ELSE THERE WOULD BE AN ERROR CAUSE
+				int playerID = DatabaseHandler.selectInt(DatabaseHandler.tabellName_profile, "ID", "Name", register_name);
+				clientSession.login(playerID, register_name);
+				clientSession.sendPacket(100, playerID+";"+"Successfully logged in!");
+			}else {
+				clientSession.sendPacket(101, register_failureCause);
 			}
 			break;
 		case 200:

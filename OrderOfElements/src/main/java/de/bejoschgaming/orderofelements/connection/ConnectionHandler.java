@@ -46,7 +46,7 @@ public class ConnectionHandler {
 	public static void closeServerConnection() {
 		
 		connectionAcceptor.unbind();
-		connectionAcceptor.dispose();
+		connectionAcceptor.dispose(true);
 		ConsoleHandler.printMessageInConsole("Serverconnection closed!", true);
 		
 	}
