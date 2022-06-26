@@ -9,6 +9,7 @@ import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 import de.bejoschgaming.orderofelements.filesystem.FileHandler;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
 import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
+import patchnotessystem.PatchnotesHandler;
 
 public class OOE_Main_Server {
 
@@ -28,6 +29,9 @@ public class OOE_Main_Server {
 		
 		MapHandler.loadMapsFromDB();
 		ConsoleHandler.printMessageInConsole("Loaded "+MapHandler.getLoadedMaps().size()+" maps from DB!", true);
+		
+		PatchnotesHandler.loadPatchnotesData();
+		ConsoleHandler.printMessageInConsole("Loaded patchnotes from DB! ("+(PatchnotesHandler.getPatchnotesData()!=null)+")", true);
 		
 		startMillis = System.currentTimeMillis();
 		ConsoleHandler.printMessageInConsole("Startup finished!", true);

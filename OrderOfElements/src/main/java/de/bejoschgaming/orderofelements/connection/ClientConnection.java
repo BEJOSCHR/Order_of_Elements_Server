@@ -40,6 +40,11 @@ public class ClientConnection {
 		String sendString = signal+ConnectionHandler.packetDivider+message;
 		connection.write(sendString);
 		this.sendPackets.add(sendString);
+		if(clientSession.isProfileLoaded()) {
+			ConsoleHandler.printMessageInConsole(0, "Packet send to ["+clientSession.getProfile().getName()+"-"+clientSession.getSessionID()+"] "+sendString, true);
+		}else {
+			ConsoleHandler.printMessageInConsole(0, "Packet send to [NoLogin-"+clientSession.getSessionID()+"] "+sendString, true);
+		}
 		
 	}
 	
@@ -59,8 +64,8 @@ public class ClientConnection {
 			//SYNTAX: 100-Name;Password
 			String login_name = data[0];
 			String login_password = data[1];
-			boolean login_correctData = SessionHandler.checkLoginData(login_name, login_password);
-			if(login_correctData) {
+			String login_dataError = SessionHandler.checkLoginData(login_name, login_password);
+			if(login_dataError == null) {
 				int login_playerID;
 				if(DatabaseHandler.connectedToDB) {
 					login_playerID = DatabaseHandler.selectInt(DatabaseHandler.tabellName_profile, "ID", "Name", login_name);
@@ -70,7 +75,7 @@ public class ClientConnection {
 				clientSession.login(login_playerID, login_name);
 				clientSession.sendPacket(100, login_playerID+";"+"Successfully logged in!");
 			}else {
-				clientSession.sendPacket(101, "Wrong username or password!");
+				clientSession.sendPacket(101, login_dataError);
 			}
 			break;
 		case 101:
@@ -88,6 +93,10 @@ public class ClientConnection {
 			}else {
 				clientSession.sendPacket(101, register_failureCause);
 			}
+			break;
+		case 180:
+			//ONLY SEND: PATCHNOTES
+			//SYNTAX: 180-PatchnotesData
 			break;
 		case 200:
 			//PLAYERDATA SEND REQUEST

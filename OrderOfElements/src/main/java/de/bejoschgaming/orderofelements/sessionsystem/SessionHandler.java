@@ -47,31 +47,39 @@ public class SessionHandler {
 		
 	}
 	
-	public static boolean checkLoginData(String name, String password) {
+	public static String checkLoginData(String name, String password) {
 		
 		if(DatabaseHandler.connectedToDB) {
 			//CHECK VIA DB
 			
+			//TODO CHECK IF ALREADY LOGGED IN!!!
+			
 			String selectedPW = DatabaseHandler.selectString(DatabaseHandler.tabellName_profile, "Password", "Name", name);
 			if(selectedPW == null) {
 				//NO ENTRY FOUND AT ALL
-				return false;
+				return "Wrong username or password!";
 			}else {
-				try {
-					//HASH PW:
-					MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-					messageDigest.update(password.getBytes());
-					String passwordHash = new String(messageDigest.digest());
-					if(passwordHash.equals(selectedPW)) {
-						//PW RIGHT
-						return true;
-					}else {
-						//PW WRONG
-						return false;
+				//CHECK IF ALREADY ONLINE
+				if(SessionHandler.isSessionConnected(name) == true) {
+					return "Already online!";
+				}else {
+					//NOT ONLINE
+					try {
+						//HASH PW:
+						MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+						messageDigest.update(password.getBytes());
+						String passwordHash = new String(messageDigest.digest());
+						if(passwordHash.equals(selectedPW)) {
+							//PW RIGHT
+							return null;
+						}else {
+							//PW WRONG
+							return "Wrong username or password!";
+						}
+					} catch (NoSuchAlgorithmException error) {
+						error.printStackTrace();
+						return "Wrong username or password!";
 					}
-				} catch (NoSuchAlgorithmException error) {
-					error.printStackTrace();
-					return false;
 				}
 			}
 			
@@ -81,10 +89,10 @@ public class SessionHandler {
 			for(int i = 1 ; i <= 5 ; i++) {
 				String testName = FileHandler.readOutData(FileHandler.file_DbBackupData, "TestUser_"+i);
 				if(testName.equals(name)) {
-					return true;
+					return null;
 				}
 			}
-			return false;
+			return "Wrong username or password!";
 			
 		}
 		

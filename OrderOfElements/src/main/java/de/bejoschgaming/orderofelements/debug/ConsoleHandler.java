@@ -12,6 +12,7 @@ import de.bejoschgaming.orderofelements.main.OOE_Main_Server;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
 import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
 import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
+import patchnotessystem.PatchnotesHandler;
 
 public class ConsoleHandler {
 
@@ -104,18 +105,15 @@ public class ConsoleHandler {
 							case "/sessions":
 								sendCommand_sessions(inputs);
 								break;
-							case "/reloadMaps":
-								sendCommand_reloadMaps(inputs);
-								break;
 							case "/game":
 								sendCommand_game(inputs);
 								break;
 							case "/games":
 								sendCommand_games(inputs);
 								break;
-							/*case "/update":
+							case "/update":
 								sendCommand_update(inputs);
-								break;*/
+								break;
 							case "/stop":
 								sendCommand_stop(inputs);
 								break;
@@ -173,10 +171,9 @@ public class ConsoleHandler {
 		printMessageInConsole("'/overview ' - Gives a general overview about everything interessting", true);
 		printMessageInConsole("'/session [id|name] ' - Gives info about the session", true);
 		printMessageInConsole("'/sessions ([start] [end]) ' - Shows the list of connected sessions", true);
-		printMessageInConsole("'/reloadMaps ' - Reloads all maps from the db", true);
 		printMessageInConsole("'/game [id] ' - Join the game session so you see the log of the game", true);
 		printMessageInConsole("'/games ([start] [end]) ' - Shows the list of running games", true);
-		/*printMessageInConsole("'/update [units|upgrades] ' - Reloads the units or the upgrades from the DB", true); */
+		printMessageInConsole("'/update [units|patchnotes|maps] ' - Reloads the targeted data from the DB", true);
 		printMessageInConsole("'/stop ' - Stoppes the whole server", true);
 		
 	}
@@ -333,10 +330,36 @@ public class ConsoleHandler {
 		
 	}
 	
-	private static void sendCommand_reloadMaps(List<String> inputs) {
+	private static void sendCommand_update(List<String> inputs) {
 		
-		MapHandler.loadMapsFromDB();
-		printMessageInConsole("Loaded "+MapHandler.getLoadedMaps().size()+" maps from DB on manuell reload!", true);
+		if(inputs.size() >= 2) {
+			
+			String targetUpdate = inputs.get(1);
+			
+			switch (targetUpdate) {
+			case "units":
+				
+//				printMessageInConsole("Loaded "+MapHandler.getLoadedMaps().size()+" maps from DB on manuell reload!", true);
+				break;
+			case "patchnotes":
+				PatchnotesHandler.loadPatchnotesData();
+				printMessageInConsole("Loaded patchnotes from DB on manuell reload! ("+(PatchnotesHandler.getPatchnotesData()!=null)+")", true);
+				for(ClientSession session : SessionHandler.getConnectedSessions()) {
+					PatchnotesHandler.sendPatchnotesData(session);
+				}
+				break;
+			case "maps":
+				MapHandler.loadMapsFromDB();
+				printMessageInConsole("Loaded "+MapHandler.getLoadedMaps().size()+" maps from DB on manuell reload!", true);
+				break;
+			default:
+				printMessageInConsole("/update [units|patchnotes|maps]", true);
+				break;
+			}
+			
+		}else {
+			printMessageInConsole("/update [units|patchnotes|maps]", true);
+		}
 		
 	}
 	

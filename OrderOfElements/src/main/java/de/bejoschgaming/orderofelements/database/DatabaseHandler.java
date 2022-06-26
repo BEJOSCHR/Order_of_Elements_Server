@@ -32,6 +32,7 @@ public class DatabaseHandler {
 	public static final String tabellName_games = "Games";
 	public static final String tabellName_decks = "Decks";
 	public static final String tabellName_maps = "Maps";
+	public static final String tabellName_patchnotes = "Patchnotes";
 	public static final String tabellName_replays = "Replaydata";
 	public static final String tabellName_stats = "Stats";
 	public static final String tabellName_friendList = "FriendList";
@@ -236,10 +237,11 @@ public class DatabaseHandler {
 		}
 		
 	}
-	public static List<String> getAll_Str(String tabelle, String target) {
+	public static List<String> getAll_Str(String tabelle, String target) { return getAll_Str(tabelle, target, ""); }
+	public static List<String> getAll_Str(String tabelle, String target, String suffix) {
 		
 		try {
-			String query = "SELECT "+target+" FROM "+tabelle+"";
+			String query = "SELECT "+target+" FROM "+tabelle+" "+suffix;
 			PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			ResultSet rs = stmt.executeQuery();
 			rs.first();
@@ -260,6 +262,43 @@ public class DatabaseHandler {
 		} catch (SQLException error) {
 			error.printStackTrace();
 			return null;
+		}
+		
+	}
+	
+	public static String getPatchNotesAsPacketString() {
+		
+		String fullPatchnotesData = "";
+		
+		//SELECT Datum FROM `Patchnotes` GROUP BY Datum ORDER BY Datum DESC
+		List<String> getAllDates = getAll_Str(tabellName_patchnotes, "Datum", "GROUP BY Datum ORDER BY Datum DESC");
+		
+		for(String date : getAllDates) {
+			
+			fullPatchnotesData += date+";";
+			
+			//SELECT Typ FROM `Patchnotes` WHERE Datum='26.06.2022' ORDER BY Typ ASC
+			List<String> getAllTypesOnThisDate = getAll_Str(tabellName_patchnotes, "Typ", "WHERE Datum='"+date+"' ORDER BY Typ ASC");
+			
+			for(String typ : getAllTypesOnThisDate) {
+				
+				String text = selectString(tabellName_patchnotes, "Text", "Datum,Typ", date+"','"+typ);
+				
+				fullPatchnotesData += typ+";"+text+";";
+				
+			}
+			
+			fullPatchnotesData = fullPatchnotesData.substring(0, fullPatchnotesData.length()-1); //REMOVES LAST ;
+			fullPatchnotesData += "---";
+			
+		}
+		
+		if(fullPatchnotesData == "") {
+			return null;
+		}else {
+			fullPatchnotesData = fullPatchnotesData.substring(0, fullPatchnotesData.length()-3); //REMOVES LAST ---
+			fullPatchnotesData = fullPatchnotesData.replaceAll("\r\n", "#");
+			return fullPatchnotesData;
 		}
 		
 	}
