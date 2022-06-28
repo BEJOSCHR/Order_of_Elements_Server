@@ -8,8 +8,8 @@ import de.bejoschgaming.orderofelements.database.DatabaseHandler;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 import de.bejoschgaming.orderofelements.filesystem.FileHandler;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
+import de.bejoschgaming.orderofelements.patchnotessystem.PatchnotesHandler;
 import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
-import patchnotessystem.PatchnotesHandler;
 
 public class OOE_Main_Server {
 

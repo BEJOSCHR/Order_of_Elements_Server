@@ -29,12 +29,12 @@ public class DatabaseHandler {
 	private static Timer keepConnectionTimer = null;
 
 	public static final String tabellName_profile = "Profile";
+	public static final String tabellName_playerStats = "PlayerStats";
 	public static final String tabellName_games = "Games";
 	public static final String tabellName_decks = "Decks";
 	public static final String tabellName_maps = "Maps";
 	public static final String tabellName_patchnotes = "Patchnotes";
 	public static final String tabellName_replays = "Replaydata";
-	public static final String tabellName_stats = "Stats";
 	public static final String tabellName_friendList = "FriendList";
 	public static final String tabellName_friendRequests = "FriendRequests";
 
@@ -317,6 +317,8 @@ public class DatabaseHandler {
 			messageDigest.update(password.getBytes());
 			String passwordHash = new String(messageDigest.digest());
 			DatabaseHandler.insertData(DatabaseHandler.tabellName_profile, "Name,Datum,Password", name+"','"+date+"','"+passwordHash);
+			int id = DatabaseHandler.selectInt(DatabaseHandler.tabellName_profile, "ID", "Name", name);
+			DatabaseHandler.insertData(DatabaseHandler.tabellName_playerStats, "ID", ""+id);
 			return true;
 		} catch (SQLException error) {
 //			error.printStackTrace(); //SOMETIMES SHOULD BE THROWN AS CHECK FOR DUPLICATE ENTRY (REGISTER NAME AS EXAMPLE)

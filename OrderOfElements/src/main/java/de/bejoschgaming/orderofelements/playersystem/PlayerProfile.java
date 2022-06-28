@@ -16,9 +16,8 @@ public class PlayerProfile {
 	private ClientSession clientSession;
 	private int ID;
 	private String name;
-	private RankingType ranking;
-	private int rankingPoints;
 	
+	private PlayerStats stats;
 	private List<Deck> decks = new LinkedList<Deck>();
 	private List<Integer> friendRequests = new ArrayList<>();
 	private HashMap<Integer, String> friendList = new HashMap<Integer, String>(); //FRIEND ID - DATE
@@ -30,8 +29,9 @@ public class PlayerProfile {
 		this.ID = playerID;
 		this.name = playerName;
 		
-		this.ranking = RankingType.IRON; //TODO LOAD FROM STATS DB
-		this.rankingPoints = 0; //TODO LOAD FROM STATS DB
+		this.stats = new PlayerStats(playerID);
+		//SEND PLAYER DATA
+		this.clientSession.sendPacket(200, this.stats.getDataAsString(";"));
 		
 		loadPlayerData();
 		
@@ -105,11 +105,8 @@ public class PlayerProfile {
 	public HashMap<Integer, String> getFriendList() {
 		return friendList;
 	}
-	public RankingType getRanking() {
-		return ranking;
-	}
-	public int getRankingPoints() {
-		return rankingPoints;
+	public PlayerStats getStats() {
+		return stats;
 	}
 	
 }

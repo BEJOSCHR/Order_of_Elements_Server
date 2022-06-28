@@ -13,6 +13,7 @@ import de.bejoschgaming.orderofelements.decksystem.Deck;
 import de.bejoschgaming.orderofelements.gamesystem.GameHandler;
 import de.bejoschgaming.orderofelements.mapsystem.Map;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
+import de.bejoschgaming.orderofelements.playersystem.PlayerStats;
 import de.bejoschgaming.orderofelements.queuesystem.QueueHandler;
 import de.bejoschgaming.orderofelements.queuesystem.QueueType;
 import de.bejoschgaming.orderofelements.replaysystem.GameAction;
@@ -99,11 +100,24 @@ public class ClientConnection {
 			//SYNTAX: 180-PatchnotesData
 			break;
 		case 200:
+			//ONLY SEND: CLIENT PLAYERDATA SEND
+			//SYNTAX: 200-PlayerStats
+			break;
+		case 201:
 			//PLAYERDATA SEND REQUEST
-			//SYNTAX: 200-PlayerID
+			//SYNTAX: 201-PlayerID
+			//ANSWER: 201-PlayerID-PlayerStats
 			//Sends all data of the given playerID to this client
 			int targetPlayerID = Integer.parseInt(message);
-			//TODO Send Name, Level, Status, Title etc...
+			ClientSession onlineSession = SessionHandler.getSession(targetPlayerID);
+			if(onlineSession != null && onlineSession.isProfileLoaded()) {
+				//IS ONLINE AND LOGIN so already loaded
+				this.sendPacket(201, targetPlayerID+"-"+onlineSession.getProfile().getStats().getDataAsString(";"));
+			}else {
+				//OFFLINE or NO LOGIN needs to be loaded
+				PlayerStats loadedStats = new PlayerStats(targetPlayerID);
+				this.sendPacket(201, targetPlayerID+"-"+loadedStats.getDataAsString(";"));
+			}
 			break;
 		case 205:
 			//ONLY SEND: ONLINE INFO TO ALL FRIENDS 

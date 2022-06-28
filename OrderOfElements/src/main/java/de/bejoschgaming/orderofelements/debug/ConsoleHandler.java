@@ -10,9 +10,9 @@ import de.bejoschgaming.orderofelements.gamesystem.Game;
 import de.bejoschgaming.orderofelements.gamesystem.GameHandler;
 import de.bejoschgaming.orderofelements.main.OOE_Main_Server;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
+import de.bejoschgaming.orderofelements.patchnotessystem.PatchnotesHandler;
 import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
 import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
-import patchnotessystem.PatchnotesHandler;
 
 public class ConsoleHandler {
 

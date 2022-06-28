@@ -1,4 +1,4 @@
-package patchnotessystem;
+package de.bejoschgaming.orderofelements.patchnotessystem;
 
 import de.bejoschgaming.orderofelements.connection.ClientConnection;
 import de.bejoschgaming.orderofelements.database.DatabaseHandler;

@@ -2,12 +2,12 @@ package de.bejoschgaming.orderofelements.playersystem;
 
 public enum RankingType {
 
-	IRON(0),
-	BRONZE(1),
-	SILVER(2),
-	GOLD(3),
-	PLATINUM(4),
-	DIAMOND(5);
+	UNRANKED(0),
+	PAWN(1),
+	SQUIRE(2),
+	KNIGHT(3),
+	KING(4),
+	EMPEROR(5);
 	
 	private final int number;
 	

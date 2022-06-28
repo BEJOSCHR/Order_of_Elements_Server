@@ -4,8 +4,8 @@ import java.util.Random;
 
 import de.bejoschgaming.orderofelements.connection.ClientConnection;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
+import de.bejoschgaming.orderofelements.patchnotessystem.PatchnotesHandler;
 import de.bejoschgaming.orderofelements.playersystem.PlayerProfile;
-import patchnotessystem.PatchnotesHandler;
 
 public class ClientSession {
 
