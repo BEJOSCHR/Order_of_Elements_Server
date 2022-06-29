@@ -14,6 +14,8 @@ public class PlayerStats {
 	private Color displayColor = Color.getColor("WHITE");
 	private String titel = "None";
 	
+	private String status = "Offline";
+	
 	private int playerID;
 	
 	public PlayerStats(int playerID) {
@@ -38,11 +40,17 @@ public class PlayerStats {
 		
 	}
 	
+	public void updateStatus(String newStatus) {
+		
+		this.status = newStatus;
+		
+	}
+	
 	public String getDataAsString(String splitSymbol) {
 		
-		//LEVEL;XP;WINS;LOSES;GAMES;WINSTREAK;RANKING;CROWNS;COLOR;TITEL
-		//EXAMPLE with split=";" - 8;62;1;3;4;-2;PAWN;12;WHITE;Veteran
-		return level+splitSymbol+XP+splitSymbol+wins+splitSymbol+loses+splitSymbol+playedGames+splitSymbol+winstreak+splitSymbol+ranking+splitSymbol+crowns+splitSymbol+displayColor+splitSymbol+titel;
+		//LEVEL;XP;WINS;LOSES;GAMES;WINSTREAK;RANKING;CROWNS;COLOR;TITEL;STATUS
+		//EXAMPLE with split=";" - 8;62;1;3;4;-2;PAWN;12;WHITE;Veteran;InGame
+		return level+splitSymbol+XP+splitSymbol+wins+splitSymbol+loses+splitSymbol+playedGames+splitSymbol+winstreak+splitSymbol+ranking+splitSymbol+crowns+splitSymbol+displayColor+splitSymbol+titel+splitSymbol+status;
 		
 	}
 
@@ -86,5 +94,8 @@ public class PlayerStats {
 		return titel;
 	}
 	
+	public String getStatus() {
+		return status;
+	}
 	
 }

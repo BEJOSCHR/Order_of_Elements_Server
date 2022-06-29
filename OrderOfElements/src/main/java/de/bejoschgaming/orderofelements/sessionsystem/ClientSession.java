@@ -13,7 +13,7 @@ public class ClientSession {
 	private long connectTimestamp;
 	
 	private boolean profileLoaded = false;
-	private PlayerProfile profile = null;;
+	private PlayerProfile profile = null;
 	private ClientConnection connection;
 	
 	public ClientSession(ClientConnection connection_) {

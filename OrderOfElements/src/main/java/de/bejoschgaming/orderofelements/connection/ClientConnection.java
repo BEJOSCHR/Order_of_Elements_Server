@@ -111,12 +111,13 @@ public class ClientConnection {
 			int targetPlayerID = Integer.parseInt(message);
 			ClientSession onlineSession = SessionHandler.getSession(targetPlayerID);
 			if(onlineSession != null && onlineSession.isProfileLoaded()) {
-				//IS ONLINE AND LOGIN so already loaded
-				this.sendPacket(201, targetPlayerID+"-"+onlineSession.getProfile().getStats().getDataAsString(";"));
+				//IS ONLINE AND LOGIN, so already loaded
+				this.sendPacket(201, targetPlayerID+"-"+onlineSession.getProfile().getName()+"-"+onlineSession.getProfile().getStats().getDataAsString(";"));
 			}else {
-				//OFFLINE or NO LOGIN needs to be loaded
+				//OFFLINE or NO LOGIN, needs to be loaded
 				PlayerStats loadedStats = new PlayerStats(targetPlayerID);
-				this.sendPacket(201, targetPlayerID+"-"+loadedStats.getDataAsString(";"));
+				String name = DatabaseHandler.selectString(DatabaseHandler.tabellName_profile, "Name", "ID", ""+targetPlayerID);
+				this.sendPacket(201, targetPlayerID+"-"+name+"-"+loadedStats.getDataAsString(";"));
 			}
 			break;
 		case 205:
