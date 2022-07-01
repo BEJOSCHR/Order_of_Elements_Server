@@ -52,8 +52,6 @@ public class SessionHandler {
 		if(DatabaseHandler.connectedToDB) {
 			//CHECK VIA DB
 			
-			//TODO CHECK IF ALREADY LOGGED IN!!!
-			
 			String selectedPW = DatabaseHandler.selectString(DatabaseHandler.tabellName_profile, "Password", "Name", name);
 			if(selectedPW == null) {
 				//NO ENTRY FOUND AT ALL

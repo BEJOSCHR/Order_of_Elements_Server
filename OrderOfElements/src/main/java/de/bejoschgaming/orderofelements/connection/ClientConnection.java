@@ -73,8 +73,8 @@ public class ClientConnection {
 				}else {
 					login_playerID = new Random().nextInt(99)+1;
 				}
-				clientSession.login(login_playerID, login_name);
 				clientSession.sendPacket(100, login_playerID+";"+"Successfully logged in!");
+				clientSession.login(login_playerID, login_name);
 			}else {
 				clientSession.sendPacket(101, login_dataError);
 			}
@@ -117,7 +117,12 @@ public class ClientConnection {
 				//OFFLINE or NO LOGIN, needs to be loaded
 				PlayerStats loadedStats = new PlayerStats(targetPlayerID);
 				String name = DatabaseHandler.selectString(DatabaseHandler.tabellName_profile, "Name", "ID", ""+targetPlayerID);
-				this.sendPacket(201, targetPlayerID+"-"+name+"-"+loadedStats.getDataAsString(";"));
+				if(loadedStats.isLoaded() == false || name == null) {
+					//INVALID OR UNKNOWN PLAYERID !!!
+					ConsoleHandler.printMessageInConsole("Client request stats for unknown playerid '"+targetPlayerID+"'!", true);
+				}else {
+					this.sendPacket(201, targetPlayerID+"-"+name+"-"+loadedStats.getDataAsString(";"));
+				}
 			}
 			break;
 		case 205:

@@ -103,6 +103,19 @@ public class DatabaseHandler {
 	}
 	
 // SELECT / GET ===============================================================================================================
+	public static ResultSet selectRawResultSet(String tabelle, String target, String keyName, String key) {
+		
+		try {
+			String query = "SELECT "+target+" FROM "+tabelle+" where ("+keyName+")=('"+key+"')";
+			PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = stmt.executeQuery();
+			return rs;
+		} catch (SQLException error) {
+			//error.printStackTrace(); //MANCHMAL ABSICHTILICHE FEHLER ABFRAGEN ZUM TESTEN
+			return null;
+		}
+		
+	}
 	public static String selectString(String tabelle, String target, String keyName, String key) {
 		
 		try {

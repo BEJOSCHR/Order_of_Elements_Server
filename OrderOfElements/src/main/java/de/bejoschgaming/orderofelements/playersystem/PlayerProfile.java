@@ -29,8 +29,9 @@ public class PlayerProfile {
 		this.ID = playerID;
 		this.name = playerName;
 		
+		//LOAD AND SEND PLAYER STATS
 		this.stats = new PlayerStats(playerID);
-		//SEND PLAYER DATA
+		this.stats.updateStatus("Online");
 		this.clientSession.sendPacket(200, this.stats.getDataAsString(";"));
 		
 		loadPlayerData();
