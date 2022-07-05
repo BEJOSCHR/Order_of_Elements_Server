@@ -9,7 +9,6 @@ import org.apache.mina.core.session.IoSession;
 
 import de.bejoschgaming.orderofelements.database.DatabaseHandler;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
-import de.bejoschgaming.orderofelements.filesystem.FileHandler;
 
 public class SessionHandler {
 
@@ -82,16 +81,8 @@ public class SessionHandler {
 			}
 			
 		}else {
-			//USE BACKUP FILE
-			
-			for(int i = 1 ; i <= 5 ; i++) {
-				String testName = FileHandler.readOutData(FileHandler.file_DbBackupData, "TestUser_"+i);
-				if(testName.equals(name)) {
-					return null;
-				}
-			}
+			//NO DB ERROR MESSAGE (none specific for security reasons)
 			return "Wrong username or password!";
-			
 		}
 		
 	}

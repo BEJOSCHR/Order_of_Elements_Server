@@ -42,8 +42,9 @@ public class PlayerProfile {
 		
 		loadDecks();
 		loadFriendRequests();
+		sendInfoAboutFriendRequests();
 		loadFriendList();
-		sendOnlineInfoToFriends();
+		sendInfoAboutAndToFriends();
 		
 	}
 	
@@ -55,6 +56,12 @@ public class PlayerProfile {
 		//ALLE REQUESTS (ID1) WO DIESE ID DAS ZIEL (ID2) IST
 		this.friendRequests = DatabaseHandler.getAllWhereEqual_Int(DatabaseHandler.tabellName_friendRequests, "ID1", "ID2", ""+this.ID);
 	}
+	private void sendInfoAboutFriendRequests() {
+		for(int friendRequestID : this.friendRequests) {
+			String requestName = DatabaseHandler.selectString(DatabaseHandler.tabellName_profile, "Name", "ID", ""+friendRequestID);
+			clientSession.getConnection().sendPacket(241, friendRequestID+";"+requestName);
+		}
+	}
 	public void loadFriendList() {
 		this.friendList.clear();
 		//ALLE IDs (ID2) DIE DIESE ID (ID1) HABEN
@@ -64,14 +71,18 @@ public class PlayerProfile {
 			this.friendList.put(friendID, date);
 		}
 	}
-	
-	private void sendOnlineInfoToFriends() {
+	private void sendInfoAboutAndToFriends() {
 		//SEND ONLINE INFO TO ALL FRIENDS WHICH ARE ONLINE
 		for(int friendID : this.friendList.keySet()) {
 			ClientSession friendSession = SessionHandler.getSession(friendID);
 			if(friendSession != null) {
 				//FRIEND IS CONNECTED
 				friendSession.sendPacket(205, ""+this.ID);
+				//SEND INFO THAT FRIEND IS ONLINE
+				clientSession.sendPacket(205, ""+friendID);
+			}else {
+				//SEND INFO THAT FRIEND IS OFFLINE
+				clientSession.sendPacket(206, ""+friendID);
 			}
 		}
 	}

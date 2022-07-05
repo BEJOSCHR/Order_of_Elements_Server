@@ -26,7 +26,6 @@ public class FileHandler {
 	
 	private static File ordner = new File("OrderOfElements/rsc");
 	public static File file_Settings = new File(ordner+"/Settings.xml");
-	public static File file_DbBackupData = new File(ordner+"/DbBackupData.xml");
 
 	
 //==========================================================================================================
@@ -53,17 +52,6 @@ public class FileHandler {
 			saveDataInFile(file_Settings, "DB_User", "OrderOfElements");
 			saveDataInFile(file_Settings, "DB_Password", "1991");
 			ConsoleHandler.printMessageInConsole("Created file '"+file_Settings.getAbsolutePath()+"' on first write", true);
-		}
-		if(readOutData(file_DbBackupData, "Successfully") == null) {
-			//HOLD THE DATA WHICH IS USED IF NO DB IS FOUND, JUST FOR TEST AND EMERGENCY USE BECAUSE NOT UP TO DATE MOST OF THE TIME!
-			createNewXmlFile(file_DbBackupData);
-			saveDataInFile(file_DbBackupData, "Usage", "HOLD THE DATA WHICH IS USED IF NO DB IS FOUND, JUST FOR TEST AND EMERGENCY USE BECAUSE NOT UP TO DATE MOST OF THE TIME!");
-			saveDataInFile(file_DbBackupData, "TestUser_1", "User1");
-			saveDataInFile(file_DbBackupData, "TestUser_2", "User2");
-			saveDataInFile(file_DbBackupData, "TestUser_3", "User3");
-			saveDataInFile(file_DbBackupData, "TestUser_4", "User4");
-			saveDataInFile(file_DbBackupData, "TestUser_5", "VeryLongName");
-			ConsoleHandler.printMessageInConsole("Created file '"+file_DbBackupData.getAbsolutePath()+"' on first write", true);
 		}
 		
 		ConsoleHandler.printMessageInConsole("Finished file system check!", true);

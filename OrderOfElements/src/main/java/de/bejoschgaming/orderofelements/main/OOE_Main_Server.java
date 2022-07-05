@@ -24,6 +24,10 @@ public class OOE_Main_Server {
 		ConsoleHandler.startUserInputScanner();
 		
 		DatabaseHandler.connectToDB();
+		if(DatabaseHandler.connectedToDB == false) {
+			ConsoleHandler.printMessageInConsole("Startup aborted! Can't continue withut db connection!", true);
+			System.exit(1);
+		}
 		
 		ConnectionHandler.startServerConnection();
 		

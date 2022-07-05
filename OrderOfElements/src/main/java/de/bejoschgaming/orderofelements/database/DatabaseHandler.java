@@ -52,9 +52,8 @@ public class DatabaseHandler {
 				ConsoleHandler.printMessageInConsole("Succesfully connected to DB '"+DBname+"'!", true);
 			}catch(SQLException error) {
 				connectedToDB = false;
-				error.printStackTrace();
-				ConsoleHandler.printMessageInConsole("Connecting to DB failed!", true);
-				ConsoleHandler.printMessageInConsole("Using backup file data for startup without DB connection ...", true);
+//				error.printStackTrace();
+				ConsoleHandler.printMessageInConsole("Connecting to DB failed! "+error.getMessage(), true);
 			}
 			
 		}else {

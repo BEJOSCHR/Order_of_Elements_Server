@@ -101,7 +101,7 @@ public class ClientConnection {
 			break;
 		case 200:
 			//ONLY SEND: CLIENT PLAYERDATA SEND
-			//SYNTAX: 200-PlayerStats
+			//SEND SYNTAX: 200-PlayerStats
 			break;
 		case 201:
 			//PLAYERDATA SEND REQUEST
@@ -130,6 +130,19 @@ public class ClientConnection {
 			break;
 		case 206:
 			//ONLY SEND: OFFLINE INFO TO ALL FRIENDS 
+			break;
+		case 207:
+			//CHANGE STATUS AND INFO TO ALL FRIENDS
+			//Syntax: 207-Status
+			//Answer: 207-chengerID;newStatus
+			String newStatus = message;
+			clientSession.getProfile().getStats().updateStatus(newStatus);
+			for(int friendID : clientSession.getProfile().getFriendList().keySet()) {
+				ClientSession onlineFriend = SessionHandler.getSession(friendID);
+				if(onlineFriend != null) {
+					onlineFriend.getConnection().sendPacket(207, friendID+";"+newStatus);
+				}
+			}
 			break;
 		case 220:
 			//DECK SEND REQUEST
@@ -169,18 +182,10 @@ public class ClientConnection {
 				sendPacket(230, map.getName()+";"+map.getData());
 			}
 			break;
-		case 240:
-			//FRIENDREQUEST SEND REQUEST
-			//SYNTAX: 240-
-			for(int requestID : this.clientSession.getProfile().getFriendRequests()) {
-				//240-requestID;requestName
-				String requestName = DatabaseHandler.selectString(DatabaseHandler.tabellName_profile, "Name", "ID", ""+requestID);
-				sendPacket(240, requestID+";"+requestName);
-			}
-			break;
 		case 241:
 			//FRIENDREQUEST ADD
 			//SYNTAX: 241-youWantToAddID
+			//ANSWER: 241-playerRequestID;playerRequestName
 			int newFriendTargetID = Integer.parseInt(message);
 			try {
 				DatabaseHandler.insertData(DatabaseHandler.tabellName_friendRequests, "ID1,ID2", clientSession.getProfile().getID()+"','"+newFriendTargetID);
@@ -191,7 +196,7 @@ public class ClientConnection {
 			if(friendTargetSession != null) {
 				//TARGET IS CONNECTED
 				friendTargetSession.getProfile().loadFriendRequests();
-				friendTargetSession.sendPacket(240, clientSession.getProfile().getID()+";"+clientSession.getProfile().getName());
+				friendTargetSession.sendPacket(241, clientSession.getProfile().getID()+";"+clientSession.getProfile().getName());
 			}
 			break;
 		case 242:
@@ -202,14 +207,16 @@ public class ClientConnection {
 			DatabaseHandler.registerNewFriendship(acceptedID, clientSession.getProfile().getID());
 			clientSession.getProfile().loadFriendRequests();
 			clientSession.getProfile().loadFriendList();
-			String friendshipDate = DatabaseHandler.selectString(DatabaseHandler.tabellName_friendList, "Datum", "ID1,ID2", acceptedID+"','"+clientSession.getProfile().getID());
-			clientSession.sendPacket(245, acceptedID+";"+friendshipDate);
 			ClientSession friendSession = SessionHandler.getSession(acceptedID);
 			if(friendSession != null) {
 				//FRIEND IS ONLINE
+				friendSession.getProfile().loadFriendRequests();
+				friendSession.getProfile().loadFriendList();
 				clientSession.sendPacket(205, ""+acceptedID);
-				friendSession.sendPacket(245, clientSession.getProfile().getID()+";"+friendshipDate);
 				friendSession.sendPacket(205, ""+clientSession.getProfile().getID());
+			}else {
+				//OFFLINE
+				clientSession.sendPacket(206, ""+acceptedID);
 			}
 			break;
 		case 243:
@@ -218,27 +225,14 @@ public class ClientConnection {
 			int deniedID = Integer.parseInt(message);
 			DatabaseHandler.deleteData(DatabaseHandler.tabellName_friendRequests, "ID1,ID2", deniedID+"','"+clientSession.getProfile().getID());
 			clientSession.getProfile().loadFriendRequests();
-			break;
-		case 245:
-			//FRIENDLIST SEND REQUEST
-			//SYNTAX: 245-
-			//Send all friendships...
-			for(int friendID : this.clientSession.getProfile().getFriendList().keySet()) {
-				//245-friendID;friendshipStartDate
-				String friendDate = this.clientSession.getProfile().getFriendList().get(friendID);
-				sendPacket(245, friendID+";"+friendDate);
-			}
-			//...and then who is online atm
-			for(int friendID : this.clientSession.getProfile().getFriendList().keySet()) {
-				if(SessionHandler.isSessionConnected(friendID)) {
-					//FRIEND IS CONNECTED
-					sendPacket(205, ""+friendID);
-				}
+			ClientSession friendDeniedSession = SessionHandler.getSession(deniedID);
+			if(friendDeniedSession != null) {
+				friendDeniedSession.getProfile().loadFriendRequests();
 			}
 			break;
-		case 246:
+		case 244:
 			//FRIEND REMOVE
-			//SYNTAX: 246-removeFriendID
+			//SYNTAX: 244-removeFriendID
 			int removeID = Integer.parseInt(message);
 			DatabaseHandler.unregisterFriendship(removeID, clientSession.getProfile().getID());
 			clientSession.getProfile().loadFriendList();
