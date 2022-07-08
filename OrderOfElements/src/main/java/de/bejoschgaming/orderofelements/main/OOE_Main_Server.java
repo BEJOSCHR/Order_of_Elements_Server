@@ -50,20 +50,28 @@ public class OOE_Main_Server {
 		
 		SessionHandler.disconnectAllSessions();
 		
-		ConnectionHandler.closeServerConnection();
-		
-		DatabaseHandler.disconnectFromDB();
-		
-		ConsoleHandler.printMessageInConsole("Shuttdown finished! [Runtime: "+(System.currentTimeMillis()-startMillis)/1000/60+" Minutes]", true);
-		
-		//CLOSE DLEAY
+		//CLOSE DLEAY - wait for sessions to be closed
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
-				ConsoleHandler.printMessageInConsole("Terminating...", true);
-				System.exit(0);
+				
+				ConnectionHandler.closeServerConnection();
+				
+				DatabaseHandler.disconnectFromDB();
+				
+				ConsoleHandler.printMessageInConsole("Shuttdown finished! [Runtime: "+(System.currentTimeMillis()-startMillis)/1000/60+" Minutes]", true);
+				
+				//CLOSE DLEAY - wait so console output can be checked
+				new Timer().schedule(new TimerTask() {
+					@Override
+					public void run() {
+						ConsoleHandler.printMessageInConsole("Terminating...", true);
+						System.exit(0);
+					}
+				}, 1000*3);
+				
 			}
-		}, 1000*3);
+		}, 1000*2);
 		
 	}
 	

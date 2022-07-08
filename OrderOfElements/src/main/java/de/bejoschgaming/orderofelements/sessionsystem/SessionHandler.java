@@ -107,10 +107,8 @@ public class SessionHandler {
 			}
 			
 		}else {
-			//USE BACKUP FILE
-			
-			return "Server error #001, please try again later!";
-			
+			//NO DB CON
+			return "Invalid username or password!";
 		}
 		
 	}

@@ -184,9 +184,22 @@ public class ClientConnection {
 			break;
 		case 241:
 			//FRIENDREQUEST ADD
-			//SYNTAX: 241-youWantToAddID
+			//SYNTAX: 241-youWantToAddNAME
 			//ANSWER: 241-playerRequestID;playerRequestName
-			int newFriendTargetID = Integer.parseInt(message);
+			String newFriendTargetName = message;
+			int newFriendTargetID = DatabaseHandler.selectInt(DatabaseHandler.tabellName_profile, "ID", "Name", newFriendTargetName);
+			//NOT IN DB
+			if(newFriendTargetID == -1) {
+				break;
+			}
+			//HIMSELF OR ALREADY FRIEND
+			if(newFriendTargetID == clientSession.getProfile().getID() || clientSession.getProfile().getFriendList().containsKey(newFriendTargetID)) {
+				break;
+			}
+			//ALREADY FRIEND REQUEST IN THE OTHER DIRECTION
+			if(DatabaseHandler.selectInt(DatabaseHandler.tabellName_friendRequests, "ID2", "ID1,ID2", newFriendTargetID+"','"+clientSession.getProfile().getID()) != -1) {
+				break;
+			}
 			try {
 				DatabaseHandler.insertData(DatabaseHandler.tabellName_friendRequests, "ID1,ID2", clientSession.getProfile().getID()+"','"+newFriendTargetID);
 			} catch (SQLException error) {
@@ -204,7 +217,8 @@ public class ClientConnection {
 			//SYNTAX: 242-acceptedID
 			int acceptedID = Integer.parseInt(message);
 			DatabaseHandler.deleteData(DatabaseHandler.tabellName_friendRequests, "ID1,ID2", acceptedID+"','"+clientSession.getProfile().getID());
-			DatabaseHandler.registerNewFriendship(acceptedID, clientSession.getProfile().getID());
+			boolean added = DatabaseHandler.registerNewFriendship(acceptedID, clientSession.getProfile().getID());
+			if(added == false) { ConsoleHandler.printMessageInConsole("Adding friendship failed! ("+acceptedID+" and "+clientSession.getProfile().getID()+")", true); }
 			clientSession.getProfile().loadFriendRequests();
 			clientSession.getProfile().loadFriendList();
 			ClientSession friendSession = SessionHandler.getSession(acceptedID);

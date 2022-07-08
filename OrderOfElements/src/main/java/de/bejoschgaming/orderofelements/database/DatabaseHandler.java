@@ -348,8 +348,8 @@ public class DatabaseHandler {
 		String date = doubleWriteNumber(cal.get(Calendar.DAY_OF_MONTH))+"_"+doubleWriteNumber(cal.get(Calendar.MONTH)+1)+"_"+doubleWriteNumber(cal.get(Calendar.YEAR));
 		
 		try {
-			DatabaseHandler.insertData(DatabaseHandler.tabellName_friendList, "ID1,ID2,Datum", id1+","+id2+","+date);
-			DatabaseHandler.insertData(DatabaseHandler.tabellName_friendList, "ID1,ID2,Datum", id2+","+id1+","+date);
+			DatabaseHandler.insertData(DatabaseHandler.tabellName_friendList, "ID1,ID2,Datum", id1+"','"+id2+"','"+date);
+			DatabaseHandler.insertData(DatabaseHandler.tabellName_friendList, "ID1,ID2,Datum", id2+"','"+id1+"','"+date);
 		} catch (SQLException error) {
 			return false;
 		}
