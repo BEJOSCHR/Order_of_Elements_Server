@@ -78,6 +78,7 @@ public class PlayerProfile {
 			if(friendSession != null) {
 				//FRIEND IS CONNECTED
 				friendSession.sendPacket(205, ""+this.ID);
+				friendSession.sendPacket(207, this.ID+";"+this.stats.getStatus());
 				//SEND INFO THAT FRIEND IS ONLINE
 				clientSession.sendPacket(205, ""+friendID);
 			}else {
@@ -93,6 +94,7 @@ public class PlayerProfile {
 			ClientSession friendSession = SessionHandler.getSession(friendID);
 			if(friendSession != null) {
 				//FRIEND IS CONNECTED
+				friendSession.sendPacket(207, this.ID+";"+"Offline");
 				friendSession.sendPacket(206, ""+this.ID);
 			}
 		}
