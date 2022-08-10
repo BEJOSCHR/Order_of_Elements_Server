@@ -95,6 +95,18 @@ public class ClientConnection {
 				clientSession.sendPacket(101, register_failureCause);
 			}
 			break;
+		case 170:
+			//ONLY SEND: UNIT CATEGORIES
+			//SYNTAX: 170-Category-Description
+			break;
+		case 171:
+			//ONLY SEND: UNIT TARGETPATTERN
+			//SYNTAX: 171-Pattern-Syntax
+			break;
+		case 172:
+			//ONLY SEND: UNIT
+			//SYNTAX: 172-UnitStatsSyntax
+			break;
 		case 180:
 			//ONLY SEND: PATCHNOTES
 			//SYNTAX: 180-PatchnotesData
@@ -253,7 +265,7 @@ public class ClientConnection {
 			ClientSession friendRemoveSession = SessionHandler.getSession(removeID);
 			if(friendRemoveSession != null) {
 				//FRIEND TO REMOVE IS ONLINE, so inform about remove
-				friendRemoveSession.sendPacket(246, ""+clientSession.getProfile().getID());
+				friendRemoveSession.sendPacket(244, ""+clientSession.getProfile().getID());
 				friendRemoveSession.getProfile().loadFriendList();
 			}
 			break;

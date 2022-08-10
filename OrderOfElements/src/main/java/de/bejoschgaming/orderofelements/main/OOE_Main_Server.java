@@ -10,6 +10,7 @@ import de.bejoschgaming.orderofelements.filesystem.FileHandler;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
 import de.bejoschgaming.orderofelements.patchnotessystem.PatchnotesHandler;
 import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
+import de.bejoschgaming.orderofelements.unitsystem.UnitHandler;
 
 public class OOE_Main_Server {
 
@@ -36,6 +37,9 @@ public class OOE_Main_Server {
 		
 		PatchnotesHandler.loadPatchnotesData();
 		ConsoleHandler.printMessageInConsole("Loaded patchnotes from DB! ("+(PatchnotesHandler.getPatchnotesData()!=null)+")", true);
+		
+		UnitHandler.loadUnitData();
+		ConsoleHandler.printMessageInConsole("Loaded "+UnitHandler.getUnitCategories().size()+" unitCategories, "+UnitHandler.getUnitTargetPattern().size()+" unitTargetPatterns and "+UnitHandler.getUnits().size()+" units!", true);
 		
 		startMillis = System.currentTimeMillis();
 		ConsoleHandler.printMessageInConsole("Startup finished!", true);

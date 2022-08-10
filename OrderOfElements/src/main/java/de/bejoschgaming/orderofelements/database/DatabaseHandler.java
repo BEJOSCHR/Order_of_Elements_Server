@@ -16,6 +16,9 @@ import java.util.TimerTask;
 
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 import de.bejoschgaming.orderofelements.filesystem.FileHandler;
+import de.bejoschgaming.orderofelements.unitsystem.Unit;
+import de.bejoschgaming.orderofelements.unitsystem.UnitCategory;
+import de.bejoschgaming.orderofelements.unitsystem.UnitTargetPattern;
 
 public class DatabaseHandler {
 
@@ -37,6 +40,9 @@ public class DatabaseHandler {
 	public static final String tabellName_replays = "Replaydata";
 	public static final String tabellName_friendList = "FriendList";
 	public static final String tabellName_friendRequests = "FriendRequests";
+	public static final String tabellName_units = "Units";
+	public static final String tabellName_unitsCategories = "Units_Category";
+	public static final String tabellName_unitsTargetPattern = "Units_TargetPattern";
 
 	//QUELLE: https://www.youtube.com/watch?v=B928IDexsGk
 	
@@ -312,6 +318,66 @@ public class DatabaseHandler {
 			fullPatchnotesData = fullPatchnotesData.replaceAll("\r\n", "#");
 			return fullPatchnotesData;
 		}
+		
+	}
+	
+	public static List<UnitCategory> getUnitCategories() {
+		
+		List<UnitCategory> categories = new ArrayList<UnitCategory>();
+		
+		//SELECT Category FROM `Units_Category`
+		List<String> getAllCategories = getAll_Str(tabellName_unitsCategories, "Category");
+		
+		for(String category : getAllCategories) {
+				
+			String description = selectString(tabellName_unitsCategories, "Description", "Category", category);
+			categories.add(new UnitCategory(category, description));
+			
+		}
+		
+		if(categories.isEmpty()) {
+			ConsoleHandler.printMessageInConsole("No unit_categories found in table "+tabellName_unitsCategories+"!", true);
+		}
+		return categories;
+		
+	}
+	public static List<UnitTargetPattern> getUnitTargetPattern() {
+		
+		List<UnitTargetPattern> targetPatterns = new ArrayList<UnitTargetPattern>();
+		
+		//SELECT Pattern FROM `Units_TargetPattern`
+		List<String> getAllPatterns = getAll_Str(tabellName_unitsTargetPattern, "Pattern");
+		
+		for(String pattern : getAllPatterns) {
+				
+			String targetSyntax = selectString(tabellName_unitsTargetPattern, "TargetSyntax", "Pattern", pattern);
+			targetPatterns.add(new UnitTargetPattern(pattern, targetSyntax));
+			
+		}
+		
+		if(targetPatterns.isEmpty()) {
+			ConsoleHandler.printMessageInConsole("No unit_targetPatterns found in table "+tabellName_unitsTargetPattern+"!", true);
+		}
+		return targetPatterns;
+		
+	}
+	public static List<Unit> getUnits() {
+		
+		List<Unit> units = new ArrayList<Unit>();
+		
+		//SELECT ID FROM `Units`
+		List<Integer> getAllIDs= getAll_Int(tabellName_units, "ID");
+		
+		for(int id : getAllIDs) {
+				
+			units.add(new Unit(id));
+			
+		}
+		
+		if(units.isEmpty()) {
+			ConsoleHandler.printMessageInConsole("No units found in table "+tabellName_units+"!", true);
+		}
+		return units;
 		
 	}
 	

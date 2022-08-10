@@ -13,6 +13,10 @@ import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
 import de.bejoschgaming.orderofelements.patchnotessystem.PatchnotesHandler;
 import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
 import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
+import de.bejoschgaming.orderofelements.unitsystem.Unit;
+import de.bejoschgaming.orderofelements.unitsystem.UnitCategory;
+import de.bejoschgaming.orderofelements.unitsystem.UnitHandler;
+import de.bejoschgaming.orderofelements.unitsystem.UnitTargetPattern;
 
 public class ConsoleHandler {
 
@@ -105,6 +109,9 @@ public class ConsoleHandler {
 							case "/sessions":
 								sendCommand_sessions(inputs);
 								break;
+							case "/units":
+								sendCommand_units(inputs);
+								break;
 							case "/game":
 								sendCommand_game(inputs);
 								break;
@@ -171,6 +178,7 @@ public class ConsoleHandler {
 		printMessageInConsole("'/overview ' - Gives a general overview about everything interessting", true);
 		printMessageInConsole("'/session [id|name] ' - Gives info about the session", true);
 		printMessageInConsole("'/sessions ([start] [end]) ' - Shows the list of connected sessions", true);
+		printMessageInConsole("'/units [category|pattern] ' - Infos about units, unitCategories and unitTargetPattern", true);
 		printMessageInConsole("'/game [id] ' - Join the game session so you see the log of the game", true);
 		printMessageInConsole("'/games ([start] [end]) ' - Shows the list of running games", true);
 		printMessageInConsole("'/update [units|patchnotes|maps] ' - Reloads the targeted data from the DB", true);
@@ -268,6 +276,38 @@ public class ConsoleHandler {
 		
 	}
 
+	private static void sendCommand_units(List<String> inputs) {
+		
+		if(inputs.size() >= 2) {
+			if(inputs.get(1).equalsIgnoreCase("category") || inputs.get(1).equalsIgnoreCase("categories")) {
+				List<UnitCategory> categories = UnitHandler.getUnitCategories();
+				printMessageInConsole("UnitsCategory overview (Total "+categories.size()+"): ", true);
+				for(int i = 0 ; i < categories.size() ; i++) {
+					UnitCategory category = categories.get(i);
+					printMessageInConsole((i+1)+". Category: "+category.getCategory()+" - Description: "+category.getDescription().substring(0, 70)+"...", true);
+				}
+			}else if(inputs.get(1).equalsIgnoreCase("pattern")) {
+				List<UnitTargetPattern> targetPatterns = UnitHandler.getUnitTargetPattern();
+				printMessageInConsole("UnitsTargetPattern overview (Total "+targetPatterns.size()+"): ", true);
+				for(int i = 0 ; i < targetPatterns.size() ; i++) {
+					UnitTargetPattern targetPattern = targetPatterns.get(i);
+					printMessageInConsole((i+1)+". Pattern: "+targetPattern.getPattern()+" - RelativeTargetPoints: "+targetPattern.getTargetRelatives().size(), true);
+				}
+			}else {
+				printMessageInConsole("'/units' or '/units [category|pattern]' ", true);
+			}
+		}else {
+			printMessageInConsole("For more infos: /units [category|pattern] ", true);
+			List<Unit> units = UnitHandler.getUnits();
+			printMessageInConsole("Units overview (Total "+units.size()+"): ", true);
+			for(int i = 0 ; i < units.size() ; i++) {
+				Unit unit = units.get(i);
+				printMessageInConsole((i+1)+". ID: "+unit.getId()+" - Name: "+unit.getName()+" - Category: "+unit.getCategory().getCategory()+" ("+unit.getType_attack().getPattern()+"|"+unit.getType_move().getPattern()+"|"+unit.getType_aura().getPattern()+")", true);
+			}
+		}
+		
+	}
+	
 	private static void sendCommand_game(List<String> inputs) {
 		
 		if(inputs.size() >= 2) {
