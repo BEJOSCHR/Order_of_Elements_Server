@@ -378,8 +378,8 @@ public class ConsoleHandler {
 			
 			switch (targetUpdate) {
 			case "units":
-				
-//				printMessageInConsole("Loaded "+MapHandler.getLoadedMaps().size()+" maps from DB on manuell reload!", true);
+				UnitHandler.loadUnitData();
+				ConsoleHandler.printMessageInConsole("Loaded "+UnitHandler.getUnitCategories().size()+" unitCategories, "+UnitHandler.getUnitTargetPattern().size()+" unitTargetPatterns and "+UnitHandler.getUnits().size()+" units!", true);
 				break;
 			case "patchnotes":
 				PatchnotesHandler.loadPatchnotesData();

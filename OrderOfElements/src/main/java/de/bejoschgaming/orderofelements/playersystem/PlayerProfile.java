@@ -10,6 +10,7 @@ import de.bejoschgaming.orderofelements.decksystem.Deck;
 import de.bejoschgaming.orderofelements.decksystem.DeckHandler;
 import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
 import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
+import de.bejoschgaming.orderofelements.unitsystem.UnitHandler;
 
 public class PlayerProfile {
 
@@ -45,6 +46,7 @@ public class PlayerProfile {
 		sendInfoAboutFriendRequests();
 		loadFriendList();
 		sendInfoAboutAndToFriends();
+		UnitHandler.sendUnitData(this);
 		
 	}
 	

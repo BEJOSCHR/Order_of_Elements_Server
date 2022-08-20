@@ -11,6 +11,13 @@ public class UnitCategory {
 		
 	}
 
+	public String getUnitCategoryDataString() {
+		
+		String div = ";";
+		return category+div+description;
+		
+	}
+	
 	public String getCategory() {
 		return category;
 	}

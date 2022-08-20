@@ -1,7 +1,5 @@
 package de.bejoschgaming.orderofelements.sessionsystem;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +44,7 @@ public class SessionHandler {
 		
 	}
 	
-	public static String checkLoginData(String name, String password) {
+	public static String checkLoginData(String name, String passwordHash) {
 		
 		if(DatabaseHandler.connectedToDB) {
 			//CHECK VIA DB
@@ -61,20 +59,11 @@ public class SessionHandler {
 					return "Already online!";
 				}else {
 					//NOT ONLINE
-					try {
-						//HASH PW:
-						MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-						messageDigest.update(password.getBytes());
-						String passwordHash = new String(messageDigest.digest());
-						if(passwordHash.equals(selectedPW)) {
-							//PW RIGHT
-							return null;
-						}else {
-							//PW WRONG
-							return "Wrong username or password!";
-						}
-					} catch (NoSuchAlgorithmException error) {
-						error.printStackTrace();
+					if(passwordHash.equals(selectedPW)) {
+						//PW RIGHT
+						return null;
+					}else {
+						//PW WRONG
 						return "Wrong username or password!";
 					}
 				}

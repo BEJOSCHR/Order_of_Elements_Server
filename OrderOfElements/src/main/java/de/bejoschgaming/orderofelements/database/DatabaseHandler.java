@@ -1,7 +1,5 @@
 package de.bejoschgaming.orderofelements.database;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -384,16 +382,16 @@ public class DatabaseHandler {
 	
 // CREATE / INSERT ===============================================================================================================
 	
-	public static boolean insertNewPlayer(String name, String password) {
+	public static boolean insertNewPlayer(String name, String passwordHash) {
 		
 		try {
 			//ID VIA AUTOINCREMENT IN 
 			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europa/Berlin"));
 			String date = doubleWriteNumber(cal.get(Calendar.DAY_OF_MONTH))+"_"+doubleWriteNumber(cal.get(Calendar.MONTH)+1)+"_"+doubleWriteNumber(cal.get(Calendar.YEAR));
 			//HASH PW:
-			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-			messageDigest.update(password.getBytes());
-			String passwordHash = new String(messageDigest.digest());
+//			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+//			messageDigest.update(password.getBytes());
+//			String passwordHash = new String(messageDigest.digest());
 			DatabaseHandler.insertData(DatabaseHandler.tabellName_profile, "Name,Datum,Password", name+"','"+date+"','"+passwordHash);
 			int id = DatabaseHandler.selectInt(DatabaseHandler.tabellName_profile, "ID", "Name", name);
 			DatabaseHandler.insertData(DatabaseHandler.tabellName_playerStats, "ID", ""+id);
@@ -401,9 +399,9 @@ public class DatabaseHandler {
 		} catch (SQLException error) {
 //			error.printStackTrace(); //SOMETIMES SHOULD BE THROWN AS CHECK FOR DUPLICATE ENTRY (REGISTER NAME AS EXAMPLE)
 			return false;
-		} catch (NoSuchAlgorithmException error) {
-			error.printStackTrace();
-			return false;
+//		} catch (NoSuchAlgorithmException error) {
+//			error.printStackTrace();
+//			return false;
 		}
 		
 	}

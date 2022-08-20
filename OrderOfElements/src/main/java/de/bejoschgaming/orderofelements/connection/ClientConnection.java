@@ -64,8 +64,8 @@ public class ClientConnection {
 			//LOGIN
 			//SYNTAX: 100-Name;Password
 			String login_name = data[0];
-			String login_password = data[1];
-			String login_dataError = SessionHandler.checkLoginData(login_name, login_password);
+			String login_passwordHash = data[1];
+			String login_dataError = SessionHandler.checkLoginData(login_name, login_passwordHash);
 			if(login_dataError == null) {
 				int login_playerID;
 				if(DatabaseHandler.connectedToDB) {
@@ -83,10 +83,10 @@ public class ClientConnection {
 			//REGISTER
 			//SYNTAX: 101-Name;Password
 			String register_name = data[0];
-			String register_password = data[1];
-			String register_failureCause = SessionHandler.checkRegisterData(register_name, register_password);
+			String register_passwordHash = data[1];
+			String register_failureCause = SessionHandler.checkRegisterData(register_name, register_passwordHash);
 			if(register_failureCause == null) {
-				DatabaseHandler.insertNewPlayer(register_name, register_password);
+				DatabaseHandler.insertNewPlayer(register_name, register_passwordHash);
 				//DB CON HAS TO BE ESTABLISHED, ELSE THERE WOULD BE AN ERROR CAUSE
 				int playerID = DatabaseHandler.selectInt(DatabaseHandler.tabellName_profile, "ID", "Name", register_name);
 				clientSession.login(playerID, register_name);

@@ -20,10 +20,10 @@ public class Unit {
 		this.name = DatabaseHandler.selectString(DatabaseHandler.tabellName_units, "Name", "ID", ""+id);
 		this.cost = DatabaseHandler.selectInt(DatabaseHandler.tabellName_units, "Cost", "ID", ""+id);
 		this.category = UnitHandler.getCategoryByName(DatabaseHandler.selectString(DatabaseHandler.tabellName_units, "Category", "ID", ""+id));
-		this.cost = DatabaseHandler.selectInt(DatabaseHandler.tabellName_units, "Cost", "ID", ""+id);
-		this.cost = DatabaseHandler.selectInt(DatabaseHandler.tabellName_units, "Cost", "ID", ""+id);
-		this.cost = DatabaseHandler.selectInt(DatabaseHandler.tabellName_units, "Cost", "ID", ""+id);
-		this.cost = DatabaseHandler.selectInt(DatabaseHandler.tabellName_units, "Cost", "ID", ""+id);
+		this.health = DatabaseHandler.selectInt(DatabaseHandler.tabellName_units, "Health", "ID", ""+id);
+		this.armor = DatabaseHandler.selectInt(DatabaseHandler.tabellName_units, "Armor", "ID", ""+id);
+		this.shield = DatabaseHandler.selectInt(DatabaseHandler.tabellName_units, "Shield", "ID", ""+id);
+		this.damage = DatabaseHandler.selectInt(DatabaseHandler.tabellName_units, "Damage", "ID", ""+id);
 		this.type_attack = UnitHandler.getTargetPatternByName(DatabaseHandler.selectString(DatabaseHandler.tabellName_units, "Type_Attack", "ID", ""+id));
 		this.type_move = UnitHandler.getTargetPatternByName(DatabaseHandler.selectString(DatabaseHandler.tabellName_units, "Type_Move", "ID", ""+id));
 		this.type_aura = UnitHandler.getTargetPatternByName(DatabaseHandler.selectString(DatabaseHandler.tabellName_units, "Type_Aura", "ID", ""+id));
@@ -35,6 +35,13 @@ public class Unit {
 	}
 
 	//GETTER
+	
+	public String getUnitDataString() {
+		
+		String div = ";";
+		return id+div+name+div+cost+div+category.getCategory()+div+health+div+armor+div+shield+div+damage+div+type_attack.getPattern()+div+type_move.getPattern()+div+type_aura.getPattern();
+		
+	}
 	
 	public int getId() {
 		return id;

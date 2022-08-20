@@ -9,11 +9,13 @@ import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 public class UnitTargetPattern {
 
 	private String pattern;
+	private String rawTargetSyntax;
 	private List<Point> targetRelatives = new ArrayList<Point>();
 	
 	public UnitTargetPattern(String pattern, String targetSyntax) {
 		
 		this.pattern = pattern;
+		this.rawTargetSyntax = targetSyntax;
 		
 		for(String field : targetSyntax.split("_")) {
 			
@@ -29,8 +31,18 @@ public class UnitTargetPattern {
 		
 	}
 
+	public String getUnitTargetPatternDataString() {
+		
+		String div = ";";
+		return pattern+div+rawTargetSyntax;
+		
+	}
+	
 	public String getPattern() {
 		return pattern;
+	}
+	public String getRawTargetSyntax() {
+		return rawTargetSyntax;
 	}
 	public List<Point> getTargetRelatives() {
 		return targetRelatives;
