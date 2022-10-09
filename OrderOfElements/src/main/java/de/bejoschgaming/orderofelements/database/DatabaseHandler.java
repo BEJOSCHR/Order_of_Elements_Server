@@ -287,7 +287,7 @@ public class DatabaseHandler {
 		String fullPatchnotesData = "";
 		
 		//SELECT Datum FROM `Patchnotes` GROUP BY Datum ORDER BY Datum DESC
-		List<String> getAllDates = getAll_Str(tabellName_patchnotes, "Datum", "GROUP BY Datum ORDER BY Datum DESC");
+		List<String> getAllDates = getAll_Str(tabellName_patchnotes, "Datum", "GROUP BY Datum ORDER BY SUBSTRING(Datum, 7, 4) DESC, SUBSTRING(Datum, 4, 2) DESC, SUBSTRING(Datum, 1, 2) DESC");
 		
 		for(String date : getAllDates) {
 			

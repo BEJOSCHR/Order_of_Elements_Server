@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import de.bejoschgaming.orderofelements.database.DatabaseHandler;
+import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 
 public class PlayerStats {
 
@@ -18,6 +19,7 @@ public class PlayerStats {
 	private String rawDisplayColorName = "WHITE";
 	private Color displayColor = Color.getColor(this.rawDisplayColorName);
 	private String titel = "None";
+	private int maxDecks = 3;
 	
 	private String status = "Offline";
 	
@@ -38,9 +40,12 @@ public class PlayerStats {
 			//SELECT FIRST IF POSSIBLE
 			if(rs.first() == false) {
 				//NO RESULTS
+				ConsoleHandler.printMessageInConsole("Loaded playerstats with empty result! (ID: "+this.playerID+")", true);
 				return;
 			}
-		} catch (SQLException e) {
+		} catch (SQLException error) {
+			error.printStackTrace();
+			ConsoleHandler.printMessageInConsole("Loaded playerstats with empty result! (ID: "+this.playerID+")", true);
 			return;
 		}
 		
@@ -57,6 +62,7 @@ public class PlayerStats {
 			this.rawDisplayColorName = rs.getString(9);
 			this.displayColor = Color.getColor(rawDisplayColorName, Color.PINK);
 			this.titel = rs.getString(10);
+			this.maxDecks = rs.getInt(11);
 			this.loaded = true;
 			rs.close();
 		} catch (SQLException error) {
@@ -73,9 +79,9 @@ public class PlayerStats {
 	
 	public String getDataAsString(String splitSymbol) {
 		
-		//LEVEL;XP;WINS;LOSES;GAMES;WINSTREAK;RANKING;CROWNS;COLOR;TITEL;STATUS
-		//EXAMPLE with split=";" - 8;62;1;3;4;-2;PAWN;12;WHITE;Veteran;InGame
-		return level+splitSymbol+XP+splitSymbol+wins+splitSymbol+loses+splitSymbol+playedGames+splitSymbol+winstreak+splitSymbol+ranking+splitSymbol+crowns+splitSymbol+rawDisplayColorName+splitSymbol+titel+splitSymbol+status;
+		//LEVEL;XP;WINS;LOSES;GAMES;WINSTREAK;RANKING;CROWNS;COLOR;TITEL;MAXDECKS;STATUS
+		//EXAMPLE with split=";" - 8;62;1;3;4;-2;PAWN;12;WHITE;Veteran;3;InGame
+		return level+splitSymbol+XP+splitSymbol+wins+splitSymbol+loses+splitSymbol+playedGames+splitSymbol+winstreak+splitSymbol+ranking+splitSymbol+crowns+splitSymbol+rawDisplayColorName+splitSymbol+titel+splitSymbol+maxDecks+splitSymbol+status;
 		
 	}
 

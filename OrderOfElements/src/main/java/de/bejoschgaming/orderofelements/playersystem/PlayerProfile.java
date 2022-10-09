@@ -33,7 +33,7 @@ public class PlayerProfile {
 		//LOAD AND SEND PLAYER STATS
 		this.stats = new PlayerStats(playerID);
 		this.stats.updateStatus("Online");
-		this.clientSession.sendPacket(200, this.stats.getDataAsString(";"));
+		this.clientSession.sendPacket(200, this.ID+"-"+this.name+"-"+this.stats.getDataAsString(";"));
 		
 		loadPlayerData();
 		
@@ -52,6 +52,7 @@ public class PlayerProfile {
 	
 	public void loadDecks() {
 		this.decks = DeckHandler.getDecks(this.ID);
+		DeckHandler.sendDecksToPlayer(this.decks, this.clientSession.getConnection());
 	}
 	public void loadFriendRequests() {
 		this.friendRequests.clear();

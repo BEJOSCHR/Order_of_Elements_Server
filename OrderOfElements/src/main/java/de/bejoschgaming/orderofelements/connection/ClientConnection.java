@@ -9,7 +9,6 @@ import org.apache.mina.core.session.IoSession;
 
 import de.bejoschgaming.orderofelements.database.DatabaseHandler;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
-import de.bejoschgaming.orderofelements.decksystem.Deck;
 import de.bejoschgaming.orderofelements.gamesystem.GameHandler;
 import de.bejoschgaming.orderofelements.mapsystem.Map;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
@@ -157,12 +156,8 @@ public class ClientConnection {
 			}
 			break;
 		case 220:
-			//DECK SEND REQUEST
-			//SYNTAX: 220-
-			for(Deck deck : this.clientSession.getProfile().getDecks()) {
-				//220-DeckID;DeckOwnerID;DeckName;DeckData
-				sendPacket(220, deck.getDeckID()+";"+deck.getOwnerID()+";"+deck.getName()+";"+deck.getData());
-			}
+			//ONLY SEND: DECKs
+			//SYNTAX: 220-DeckID;DeckOwnerID;DeckName;DeckData
 			break;
 		case 221:
 			//SAVE DECK
@@ -186,6 +181,12 @@ public class ClientConnection {
 			}
 			this.clientSession.getProfile().loadDecks();
 			break;
+		case 222:
+			//DELETE DECK
+			//SYNTAX: 222-DeckID
+			int deckID2 = Integer.parseInt(message);
+			DatabaseHandler.deleteData(DatabaseHandler.tabellName_decks, "ID", ""+deckID2);
+			this.clientSession.getProfile().loadDecks();
 		case 230:
 			//MAP SEND REQUEST
 			//SYNTAX: 230-
