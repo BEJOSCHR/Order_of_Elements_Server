@@ -449,7 +449,7 @@ public class DatabaseHandler {
 	public static void updateString(String tabelle, String target, String value, String keyName, String key) {
 		
 		try {
-			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where ("+keyName+")=('"+key+"')";
+			String query = "UPDATE "+tabelle+" SET "+target+"='"+value+"' where ("+keyName+")=("+key+")";
 			PreparedStatement stmt = connection.prepareStatement(query);
 			stmt.executeUpdate();
 			stmt.close();
@@ -461,7 +461,7 @@ public class DatabaseHandler {
 	public static void updateInt(String tabelle, String target, int value, String keyName, String key) {
 		
 		try {
-			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where ("+keyName+")=('"+key+"')";
+			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where ("+keyName+")=("+key+")";
 			PreparedStatement stmt = connection.prepareStatement(query);
 			stmt.executeUpdate();
 			stmt.close();
@@ -473,7 +473,7 @@ public class DatabaseHandler {
 	public static void updateDouble(String tabelle, String target, double value, String keyName, String key) {
 	
 		try {
-			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where ("+keyName+")=('"+key+"')";
+			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where ("+keyName+")=("+key+")";
 			PreparedStatement stmt = connection.prepareStatement(query);
 			stmt.executeUpdate();
 			stmt.close();
