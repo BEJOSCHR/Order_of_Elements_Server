@@ -3,8 +3,8 @@ package de.bejoschgaming.orderofelements.sessionsystem;
 import java.util.Random;
 
 import de.bejoschgaming.orderofelements.connection.ClientConnection;
-import de.bejoschgaming.orderofelements.connection.ConnectionHandler;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
+import de.bejoschgaming.orderofelements.patchnotessystem.PatchnotesHandler;
 import de.bejoschgaming.orderofelements.playersystem.PlayerProfile;
 
 public class ClientSession {
@@ -13,7 +13,7 @@ public class ClientSession {
 	private long connectTimestamp;
 	
 	private boolean profileLoaded = false;
-	private PlayerProfile profile = null;;
+	private PlayerProfile profile = null;
 	private ClientConnection connection;
 	
 	public ClientSession(ClientConnection connection_) {
@@ -30,12 +30,14 @@ public class ClientSession {
 		profileLoaded = true;
 		ConsoleHandler.printMessageInConsole("Client "+this.initSessionID+" logged in as ("+playerName+"-"+playerID+")!", true);
 		
+		//SEND PATCHNOTES
+		PatchnotesHandler.sendPatchnotesData(this);
+		
 	}
 	
 	public void sendPacket(int signal, String message) {
 		
 		connection.sendPacket(signal, message);
-		ConsoleHandler.printMessageInConsole(0, "Packet send from "+profile.getName()+": "+signal+ConnectionHandler.packetDivider+message, false);
 		
 	}
 	

@@ -10,8 +10,13 @@ import de.bejoschgaming.orderofelements.gamesystem.Game;
 import de.bejoschgaming.orderofelements.gamesystem.GameHandler;
 import de.bejoschgaming.orderofelements.main.OOE_Main_Server;
 import de.bejoschgaming.orderofelements.mapsystem.MapHandler;
+import de.bejoschgaming.orderofelements.patchnotessystem.PatchnotesHandler;
 import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
 import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
+import de.bejoschgaming.orderofelements.unitsystem.Unit;
+import de.bejoschgaming.orderofelements.unitsystem.UnitCategory;
+import de.bejoschgaming.orderofelements.unitsystem.UnitHandler;
+import de.bejoschgaming.orderofelements.unitsystem.UnitTargetPattern;
 
 public class ConsoleHandler {
 
@@ -104,8 +109,8 @@ public class ConsoleHandler {
 							case "/sessions":
 								sendCommand_sessions(inputs);
 								break;
-							case "/reloadMaps":
-								sendCommand_reloadMaps(inputs);
+							case "/units":
+								sendCommand_units(inputs);
 								break;
 							case "/game":
 								sendCommand_game(inputs);
@@ -113,9 +118,9 @@ public class ConsoleHandler {
 							case "/games":
 								sendCommand_games(inputs);
 								break;
-							/*case "/update":
+							case "/update":
 								sendCommand_update(inputs);
-								break;*/
+								break;
 							case "/stop":
 								sendCommand_stop(inputs);
 								break;
@@ -173,10 +178,10 @@ public class ConsoleHandler {
 		printMessageInConsole("'/overview ' - Gives a general overview about everything interessting", true);
 		printMessageInConsole("'/session [id|name] ' - Gives info about the session", true);
 		printMessageInConsole("'/sessions ([start] [end]) ' - Shows the list of connected sessions", true);
-		printMessageInConsole("'/reloadMaps ' - Reloads all maps from the db", true);
+		printMessageInConsole("'/units [category|pattern] ' - Infos about units, unitCategories and unitTargetPattern", true);
 		printMessageInConsole("'/game [id] ' - Join the game session so you see the log of the game", true);
 		printMessageInConsole("'/games ([start] [end]) ' - Shows the list of running games", true);
-		/*printMessageInConsole("'/update [units|upgrades] ' - Reloads the units or the upgrades from the DB", true); */
+		printMessageInConsole("'/update [units|patchnotes|maps] ' - Reloads the targeted data from the DB", true);
 		printMessageInConsole("'/stop ' - Stoppes the whole server", true);
 		
 	}
@@ -271,6 +276,38 @@ public class ConsoleHandler {
 		
 	}
 
+	private static void sendCommand_units(List<String> inputs) {
+		
+		if(inputs.size() >= 2) {
+			if(inputs.get(1).equalsIgnoreCase("category") || inputs.get(1).equalsIgnoreCase("categories")) {
+				List<UnitCategory> categories = UnitHandler.getUnitCategories();
+				printMessageInConsole("UnitsCategory overview (Total "+categories.size()+"): ", true);
+				for(int i = 0 ; i < categories.size() ; i++) {
+					UnitCategory category = categories.get(i);
+					printMessageInConsole((i+1)+". Category: "+category.getCategory()+" - Description: "+category.getDescription().substring(0, 70)+"...", true);
+				}
+			}else if(inputs.get(1).equalsIgnoreCase("pattern")) {
+				List<UnitTargetPattern> targetPatterns = UnitHandler.getUnitTargetPattern();
+				printMessageInConsole("UnitsTargetPattern overview (Total "+targetPatterns.size()+"): ", true);
+				for(int i = 0 ; i < targetPatterns.size() ; i++) {
+					UnitTargetPattern targetPattern = targetPatterns.get(i);
+					printMessageInConsole((i+1)+". Pattern: "+targetPattern.getPattern()+" - RelativeTargetPoints: "+targetPattern.getTargetRelatives().size(), true);
+				}
+			}else {
+				printMessageInConsole("'/units' or '/units [category|pattern]' ", true);
+			}
+		}else {
+			printMessageInConsole("For more infos: /units [category|pattern] ", true);
+			List<Unit> units = UnitHandler.getUnits();
+			printMessageInConsole("Units overview (Total "+units.size()+"): ", true);
+			for(int i = 0 ; i < units.size() ; i++) {
+				Unit unit = units.get(i);
+				printMessageInConsole((i+1)+". ID: "+unit.getId()+" - Name: "+unit.getName()+" - Category: "+unit.getCategory().getCategory()+" ("+unit.getType_attack().getPattern()+"|"+unit.getType_move().getPattern()+"|"+unit.getType_aura().getPattern()+")", true);
+			}
+		}
+		
+	}
+	
 	private static void sendCommand_game(List<String> inputs) {
 		
 		if(inputs.size() >= 2) {
@@ -333,10 +370,36 @@ public class ConsoleHandler {
 		
 	}
 	
-	private static void sendCommand_reloadMaps(List<String> inputs) {
+	private static void sendCommand_update(List<String> inputs) {
 		
-		MapHandler.loadMapsFromDB();
-		printMessageInConsole("Loaded "+MapHandler.getLoadedMaps().size()+" maps from DB on manuell reload!", true);
+		if(inputs.size() >= 2) {
+			
+			String targetUpdate = inputs.get(1);
+			
+			switch (targetUpdate) {
+			case "units":
+				UnitHandler.loadUnitData();
+				ConsoleHandler.printMessageInConsole("Loaded "+UnitHandler.getUnitCategories().size()+" unitCategories, "+UnitHandler.getUnitTargetPattern().size()+" unitTargetPatterns and "+UnitHandler.getUnits().size()+" units!", true);
+				break;
+			case "patchnotes":
+				PatchnotesHandler.loadPatchnotesData();
+				printMessageInConsole("Loaded patchnotes from DB on manuell reload! ("+(PatchnotesHandler.getPatchnotesData()!=null)+")", true);
+				for(ClientSession session : SessionHandler.getConnectedSessions()) {
+					PatchnotesHandler.sendPatchnotesData(session);
+				}
+				break;
+			case "maps":
+				MapHandler.loadMapsFromDB();
+				printMessageInConsole("Loaded "+MapHandler.getLoadedMaps().size()+" maps from DB on manuell reload!", true);
+				break;
+			default:
+				printMessageInConsole("/update [units|patchnotes|maps]", true);
+				break;
+			}
+			
+		}else {
+			printMessageInConsole("/update [units|patchnotes|maps]", true);
+		}
 		
 	}
 	

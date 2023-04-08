@@ -1,7 +1,5 @@
 package de.bejoschgaming.orderofelements.database;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -16,6 +14,9 @@ import java.util.TimerTask;
 
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 import de.bejoschgaming.orderofelements.filesystem.FileHandler;
+import de.bejoschgaming.orderofelements.unitsystem.Unit;
+import de.bejoschgaming.orderofelements.unitsystem.UnitCategory;
+import de.bejoschgaming.orderofelements.unitsystem.UnitTargetPattern;
 
 public class DatabaseHandler {
 
@@ -29,13 +30,17 @@ public class DatabaseHandler {
 	private static Timer keepConnectionTimer = null;
 
 	public static final String tabellName_profile = "Profile";
+	public static final String tabellName_playerStats = "PlayerStats";
 	public static final String tabellName_games = "Games";
 	public static final String tabellName_decks = "Decks";
 	public static final String tabellName_maps = "Maps";
+	public static final String tabellName_patchnotes = "Patchnotes";
 	public static final String tabellName_replays = "Replaydata";
-	public static final String tabellName_stats = "Stats";
 	public static final String tabellName_friendList = "FriendList";
 	public static final String tabellName_friendRequests = "FriendRequests";
+	public static final String tabellName_units = "Units";
+	public static final String tabellName_unitsCategories = "Units_Category";
+	public static final String tabellName_unitsTargetPattern = "Units_TargetPattern";
 
 	//QUELLE: https://www.youtube.com/watch?v=B928IDexsGk
 	
@@ -51,9 +56,8 @@ public class DatabaseHandler {
 				ConsoleHandler.printMessageInConsole("Succesfully connected to DB '"+DBname+"'!", true);
 			}catch(SQLException error) {
 				connectedToDB = false;
-				error.printStackTrace();
-				ConsoleHandler.printMessageInConsole("Connecting to DB failed!", true);
-				ConsoleHandler.printMessageInConsole("Using backup file data for startup without DB connection ...", true);
+//				error.printStackTrace();
+				ConsoleHandler.printMessageInConsole("Connecting to DB failed! "+error.getMessage(), true);
 			}
 			
 		}else {
@@ -102,6 +106,19 @@ public class DatabaseHandler {
 	}
 	
 // SELECT / GET ===============================================================================================================
+	public static ResultSet selectRawResultSet(String tabelle, String target, String keyName, String key) {
+		
+		try {
+			String query = "SELECT "+target+" FROM "+tabelle+" where ("+keyName+")=('"+key+"')";
+			PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = stmt.executeQuery();
+			return rs;
+		} catch (SQLException error) {
+			//error.printStackTrace(); //MANCHMAL ABSICHTILICHE FEHLER ABFRAGEN ZUM TESTEN
+			return null;
+		}
+		
+	}
 	public static String selectString(String tabelle, String target, String keyName, String key) {
 		
 		try {
@@ -236,10 +253,11 @@ public class DatabaseHandler {
 		}
 		
 	}
-	public static List<String> getAll_Str(String tabelle, String target) {
+	public static List<String> getAll_Str(String tabelle, String target) { return getAll_Str(tabelle, target, ""); }
+	public static List<String> getAll_Str(String tabelle, String target, String suffix) {
 		
 		try {
-			String query = "SELECT "+target+" FROM "+tabelle+"";
+			String query = "SELECT "+target+" FROM "+tabelle+" "+suffix;
 			PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			ResultSet rs = stmt.executeQuery();
 			rs.first();
@@ -264,27 +282,126 @@ public class DatabaseHandler {
 		
 	}
 	
+	public static String getPatchNotesAsPacketString() {
+		
+		String fullPatchnotesData = "";
+		
+		//SELECT Datum FROM `Patchnotes` GROUP BY Datum ORDER BY Datum DESC
+		List<String> getAllDates = getAll_Str(tabellName_patchnotes, "Datum", "GROUP BY Datum ORDER BY SUBSTRING(Datum, 7, 4) DESC, SUBSTRING(Datum, 4, 2) DESC, SUBSTRING(Datum, 1, 2) DESC");
+		
+		for(String date : getAllDates) {
+			
+			fullPatchnotesData += date+";";
+			
+			//SELECT Typ FROM `Patchnotes` WHERE Datum='26.06.2022' ORDER BY Typ ASC
+			List<String> getAllTypesOnThisDate = getAll_Str(tabellName_patchnotes, "Typ", "WHERE Datum='"+date+"' ORDER BY Typ ASC");
+			
+			for(String typ : getAllTypesOnThisDate) {
+				
+				String text = selectString(tabellName_patchnotes, "Text", "Datum,Typ", date+"','"+typ);
+				
+				fullPatchnotesData += typ+";"+text+";";
+				
+			}
+			
+			fullPatchnotesData = fullPatchnotesData.substring(0, fullPatchnotesData.length()-1); //REMOVES LAST ;
+			fullPatchnotesData += "---";
+			
+		}
+		
+		if(fullPatchnotesData == "") {
+			return null;
+		}else {
+			fullPatchnotesData = fullPatchnotesData.substring(0, fullPatchnotesData.length()-3); //REMOVES LAST ---
+			fullPatchnotesData = fullPatchnotesData.replaceAll("\r\n", "#");
+			return fullPatchnotesData;
+		}
+		
+	}
+	
+	public static List<UnitCategory> getUnitCategories() {
+		
+		List<UnitCategory> categories = new ArrayList<UnitCategory>();
+		
+		//SELECT Category FROM `Units_Category`
+		List<String> getAllCategories = getAll_Str(tabellName_unitsCategories, "Category");
+		
+		for(String category : getAllCategories) {
+				
+			String description = selectString(tabellName_unitsCategories, "Description", "Category", category);
+			categories.add(new UnitCategory(category, description));
+			
+		}
+		
+		if(categories.isEmpty()) {
+			ConsoleHandler.printMessageInConsole("No unit_categories found in table "+tabellName_unitsCategories+"!", true);
+		}
+		return categories;
+		
+	}
+	public static List<UnitTargetPattern> getUnitTargetPattern() {
+		
+		List<UnitTargetPattern> targetPatterns = new ArrayList<UnitTargetPattern>();
+		
+		//SELECT Pattern FROM `Units_TargetPattern`
+		List<String> getAllPatterns = getAll_Str(tabellName_unitsTargetPattern, "Pattern");
+		
+		for(String pattern : getAllPatterns) {
+				
+			String targetSyntax = selectString(tabellName_unitsTargetPattern, "TargetSyntax", "Pattern", pattern);
+			targetPatterns.add(new UnitTargetPattern(pattern, targetSyntax));
+			
+		}
+		
+		if(targetPatterns.isEmpty()) {
+			ConsoleHandler.printMessageInConsole("No unit_targetPatterns found in table "+tabellName_unitsTargetPattern+"!", true);
+		}
+		return targetPatterns;
+		
+	}
+	public static List<Unit> getUnits() {
+		
+		List<Unit> units = new ArrayList<Unit>();
+		
+		//SELECT ID FROM `Units`
+		List<Integer> getAllIDs= getAll_Int(tabellName_units, "ID");
+		
+		for(int id : getAllIDs) {
+				
+			units.add(new Unit(id));
+			
+		}
+		
+		if(units.isEmpty()) {
+			ConsoleHandler.printMessageInConsole("No units found in table "+tabellName_units+"!", true);
+		}
+		return units;
+		
+	}
+	
 	
 // CREATE / INSERT ===============================================================================================================
 	
-	public static boolean insertNewPlayer(String name, String password) {
+	public static boolean insertNewPlayer(String name, String passwordHash) {
 		
 		try {
 			//ID VIA AUTOINCREMENT IN 
 			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europa/Berlin"));
 			String date = doubleWriteNumber(cal.get(Calendar.DAY_OF_MONTH))+"_"+doubleWriteNumber(cal.get(Calendar.MONTH)+1)+"_"+doubleWriteNumber(cal.get(Calendar.YEAR));
 			//HASH PW:
-			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-			messageDigest.update(password.getBytes());
-			String passwordHash = new String(messageDigest.digest());
+//			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+//			messageDigest.update(password.getBytes());
+//			String passwordHash = new String(messageDigest.digest());
 			DatabaseHandler.insertData(DatabaseHandler.tabellName_profile, "Name,Datum,Password", name+"','"+date+"','"+passwordHash);
+			int id = DatabaseHandler.selectInt(DatabaseHandler.tabellName_profile, "ID", "Name", name);
+			DatabaseHandler.insertData(DatabaseHandler.tabellName_playerStats, "ID", ""+id);
 			return true;
 		} catch (SQLException error) {
 //			error.printStackTrace(); //SOMETIMES SHOULD BE THROWN AS CHECK FOR DUPLICATE ENTRY (REGISTER NAME AS EXAMPLE)
 			return false;
-		} catch (NoSuchAlgorithmException error) {
-			error.printStackTrace();
-			return false;
+//		} catch (NoSuchAlgorithmException error) {
+//			error.printStackTrace();
+//			return false;
 		}
 		
 	}
@@ -295,8 +412,8 @@ public class DatabaseHandler {
 		String date = doubleWriteNumber(cal.get(Calendar.DAY_OF_MONTH))+"_"+doubleWriteNumber(cal.get(Calendar.MONTH)+1)+"_"+doubleWriteNumber(cal.get(Calendar.YEAR));
 		
 		try {
-			DatabaseHandler.insertData(DatabaseHandler.tabellName_friendList, "ID1,ID2,Datum", id1+","+id2+","+date);
-			DatabaseHandler.insertData(DatabaseHandler.tabellName_friendList, "ID1,ID2,Datum", id2+","+id1+","+date);
+			DatabaseHandler.insertData(DatabaseHandler.tabellName_friendList, "ID1,ID2,Datum", id1+"','"+id2+"','"+date);
+			DatabaseHandler.insertData(DatabaseHandler.tabellName_friendList, "ID1,ID2,Datum", id2+"','"+id1+"','"+date);
 		} catch (SQLException error) {
 			return false;
 		}
@@ -332,7 +449,7 @@ public class DatabaseHandler {
 	public static void updateString(String tabelle, String target, String value, String keyName, String key) {
 		
 		try {
-			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where ("+keyName+")=('"+key+"')";
+			String query = "UPDATE "+tabelle+" SET "+target+"='"+value+"' where ("+keyName+")=("+key+")";
 			PreparedStatement stmt = connection.prepareStatement(query);
 			stmt.executeUpdate();
 			stmt.close();
@@ -344,7 +461,7 @@ public class DatabaseHandler {
 	public static void updateInt(String tabelle, String target, int value, String keyName, String key) {
 		
 		try {
-			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where ("+keyName+")=('"+key+"')";
+			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where ("+keyName+")=("+key+")";
 			PreparedStatement stmt = connection.prepareStatement(query);
 			stmt.executeUpdate();
 			stmt.close();
@@ -356,7 +473,7 @@ public class DatabaseHandler {
 	public static void updateDouble(String tabelle, String target, double value, String keyName, String key) {
 	
 		try {
-			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where ("+keyName+")=('"+key+"')";
+			String query = "UPDATE "+tabelle+" SET "+target+"="+value+" where ("+keyName+")=("+key+")";
 			PreparedStatement stmt = connection.prepareStatement(query);
 			stmt.executeUpdate();
 			stmt.close();

@@ -10,15 +10,15 @@ import de.bejoschgaming.orderofelements.decksystem.Deck;
 import de.bejoschgaming.orderofelements.decksystem.DeckHandler;
 import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
 import de.bejoschgaming.orderofelements.sessionsystem.SessionHandler;
+import de.bejoschgaming.orderofelements.unitsystem.UnitHandler;
 
 public class PlayerProfile {
 
 	private ClientSession clientSession;
 	private int ID;
 	private String name;
-	private RankingType ranking;
-	private int rankingPoints;
 	
+	private PlayerStats stats;
 	private List<Deck> decks = new LinkedList<Deck>();
 	private List<Integer> friendRequests = new ArrayList<>();
 	private HashMap<Integer, String> friendList = new HashMap<Integer, String>(); //FRIEND ID - DATE
@@ -30,8 +30,10 @@ public class PlayerProfile {
 		this.ID = playerID;
 		this.name = playerName;
 		
-		this.ranking = RankingType.IRON; //TODO LOAD FROM STATS DB
-		this.rankingPoints = 0; //TODO LOAD FROM STATS DB
+		//LOAD AND SEND PLAYER STATS
+		this.stats = new PlayerStats(playerID);
+		this.stats.updateStatus("Online");
+		this.clientSession.sendPacket(200, this.ID+"-"+this.name+"-"+this.stats.getDataAsString(";"));
 		
 		loadPlayerData();
 		
@@ -41,18 +43,27 @@ public class PlayerProfile {
 		
 		loadDecks();
 		loadFriendRequests();
+		sendInfoAboutFriendRequests();
 		loadFriendList();
-		sendOnlineInfoToFriends();
+		sendInfoAboutAndToFriends();
+		UnitHandler.sendUnitData(this);
 		
 	}
 	
 	public void loadDecks() {
 		this.decks = DeckHandler.getDecks(this.ID);
+		DeckHandler.sendDecksToPlayer(this.decks, this.clientSession.getConnection());
 	}
 	public void loadFriendRequests() {
 		this.friendRequests.clear();
 		//ALLE REQUESTS (ID1) WO DIESE ID DAS ZIEL (ID2) IST
 		this.friendRequests = DatabaseHandler.getAllWhereEqual_Int(DatabaseHandler.tabellName_friendRequests, "ID1", "ID2", ""+this.ID);
+	}
+	private void sendInfoAboutFriendRequests() {
+		for(int friendRequestID : this.friendRequests) {
+			String requestName = DatabaseHandler.selectString(DatabaseHandler.tabellName_profile, "Name", "ID", ""+friendRequestID);
+			clientSession.getConnection().sendPacket(241, friendRequestID+";"+requestName);
+		}
 	}
 	public void loadFriendList() {
 		this.friendList.clear();
@@ -63,14 +74,19 @@ public class PlayerProfile {
 			this.friendList.put(friendID, date);
 		}
 	}
-	
-	private void sendOnlineInfoToFriends() {
+	private void sendInfoAboutAndToFriends() {
 		//SEND ONLINE INFO TO ALL FRIENDS WHICH ARE ONLINE
 		for(int friendID : this.friendList.keySet()) {
 			ClientSession friendSession = SessionHandler.getSession(friendID);
 			if(friendSession != null) {
 				//FRIEND IS CONNECTED
 				friendSession.sendPacket(205, ""+this.ID);
+				friendSession.sendPacket(207, this.ID+";"+this.stats.getStatus());
+				//SEND INFO THAT FRIEND IS ONLINE
+				clientSession.sendPacket(205, ""+friendID);
+			}else {
+				//SEND INFO THAT FRIEND IS OFFLINE
+				clientSession.sendPacket(206, ""+friendID);
 			}
 		}
 	}
@@ -81,6 +97,7 @@ public class PlayerProfile {
 			ClientSession friendSession = SessionHandler.getSession(friendID);
 			if(friendSession != null) {
 				//FRIEND IS CONNECTED
+				friendSession.sendPacket(207, this.ID+";"+"Offline");
 				friendSession.sendPacket(206, ""+this.ID);
 			}
 		}
@@ -105,11 +122,8 @@ public class PlayerProfile {
 	public HashMap<Integer, String> getFriendList() {
 		return friendList;
 	}
-	public RankingType getRanking() {
-		return ranking;
-	}
-	public int getRankingPoints() {
-		return rankingPoints;
+	public PlayerStats getStats() {
+		return stats;
 	}
 	
 }

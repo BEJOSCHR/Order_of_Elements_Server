@@ -27,17 +27,17 @@ public class QueueHandler {
 		case NORMAL:
 			for(ClientSession session1 : queues_normal) {
 				for(ClientSession session2 : queues_normal) {
-					int rankingDifferenz = session1.getProfile().getRanking().getNumber()-session2.getProfile().getRanking().getNumber();
+					int rankingDifferenz = session1.getProfile().getStats().getRanking().getNumber()-session2.getProfile().getStats().getRanking().getNumber();
 					if(rankingDifferenz >= -normalQueue_rankingDifferenz && rankingDifferenz <= normalQueue_rankingDifferenz) {
 						//RANKING FITS
-						int rankingPointDifferenz = session1.getProfile().getRankingPoints()-session2.getProfile().getRankingPoints();
+						int rankingPointDifferenz = session1.getProfile().getStats().getCrowns()-session2.getProfile().getStats().getCrowns();
 						if(rankingPointDifferenz >= -normalQueue_rankingPointsDifferenz && rankingPointDifferenz <= normalQueue_rankingPointsDifferenz) {
 							//RANKING POINTS FIT
 							
 							//CREATE GAME
 							GameHandler.registerNewGame(session1, session2, GameType.NORMAL);
 							
-							ConsoleHandler.printMessageInConsole("Matched "+session1.getProfile().getName()+" ("+session1.getProfile().getRanking()+"-"+session1.getProfile().getRankingPoints()+") with "+session2.getProfile().getName()+" ("+session2.getProfile().getRanking()+"-"+session2.getProfile().getRankingPoints()+") in queue "+type+"!", true);
+							ConsoleHandler.printMessageInConsole("Matched "+session1.getProfile().getName()+" ("+session1.getProfile().getStats().getRanking()+"-"+session1.getProfile().getStats().getCrowns()+") with "+session2.getProfile().getName()+" ("+session2.getProfile().getStats().getRanking()+"-"+session2.getProfile().getStats().getCrowns()+") in queue "+type+"!", true);
 							return;
 						}
 					}
@@ -47,17 +47,17 @@ public class QueueHandler {
 		case RANKED:
 			for(ClientSession session1 : queues_ranked) {
 				for(ClientSession session2 : queues_ranked) {
-					int rankingDifferenz = session1.getProfile().getRanking().getNumber()-session2.getProfile().getRanking().getNumber();
+					int rankingDifferenz = session1.getProfile().getStats().getRanking().getNumber()-session2.getProfile().getStats().getRanking().getNumber();
 					if(rankingDifferenz >= rankedQueue_rankingDifferenz && rankingDifferenz <= rankedQueue_rankingDifferenz) {
 						//RANKING FITS
-						int rankingPointDifferenz = session1.getProfile().getRankingPoints()-session2.getProfile().getRankingPoints();
+						int rankingPointDifferenz = session1.getProfile().getStats().getCrowns()-session2.getProfile().getStats().getCrowns();
 						if(rankingPointDifferenz >= -rankedQueue_rankingPointsDifferenz && rankingPointDifferenz <= rankedQueue_rankingPointsDifferenz) {
 							//RANKING POINTS FIT
 							
 							//CREATE GAME
 							GameHandler.registerNewGame(session1, session2, GameType.RANKED);
 							
-							ConsoleHandler.printMessageInConsole("Matched "+session1.getProfile().getName()+" ("+session1.getProfile().getRanking()+"-"+session1.getProfile().getRankingPoints()+") with "+session2.getProfile().getName()+" ("+session2.getProfile().getRanking()+"-"+session2.getProfile().getRankingPoints()+") in queue "+type+"!", true);
+							ConsoleHandler.printMessageInConsole("Matched "+session1.getProfile().getName()+" ("+session1.getProfile().getStats().getRanking()+"-"+session1.getProfile().getStats().getCrowns()+") with "+session2.getProfile().getName()+" ("+session2.getProfile().getStats().getRanking()+"-"+session2.getProfile().getStats().getCrowns()+") in queue "+type+"!", true);
 							return;
 						}
 					}
@@ -67,17 +67,17 @@ public class QueueHandler {
 		case SPEZIAL:
 			for(ClientSession session1 : queues_spezial) {
 				for(ClientSession session2 : queues_spezial) {
-					int rankingDifferenz = session1.getProfile().getRanking().getNumber()-session2.getProfile().getRanking().getNumber();
+					int rankingDifferenz = session1.getProfile().getStats().getRanking().getNumber()-session2.getProfile().getStats().getRanking().getNumber();
 					if(rankingDifferenz >= -spezialQueue_rankingDifferenz && rankingDifferenz <= spezialQueue_rankingDifferenz) {
 						//RANKING FITS
-						int rankingPointDifferenz = session1.getProfile().getRankingPoints()-session2.getProfile().getRankingPoints();
+						int rankingPointDifferenz = session1.getProfile().getStats().getCrowns()-session2.getProfile().getStats().getCrowns();
 						if(rankingPointDifferenz >= -spezialQueue_rankingPointsDifferenz && rankingPointDifferenz <= spezialQueue_rankingPointsDifferenz) {
 							//RANKING POINTS FIT
 							
 							//CREATE GAME
 							GameHandler.registerNewGame(session1, session2, GameType.SPEZIAL);
 							
-							ConsoleHandler.printMessageInConsole("Matched "+session1.getProfile().getName()+" ("+session1.getProfile().getRanking()+"-"+session1.getProfile().getRankingPoints()+") with "+session2.getProfile().getName()+" ("+session2.getProfile().getRanking()+"-"+session2.getProfile().getRankingPoints()+") in queue "+type+"!", true);
+							ConsoleHandler.printMessageInConsole("Matched "+session1.getProfile().getName()+" ("+session1.getProfile().getStats().getRanking()+"-"+session1.getProfile().getStats().getCrowns()+") with "+session2.getProfile().getName()+" ("+session2.getProfile().getStats().getRanking()+"-"+session2.getProfile().getStats().getCrowns()+") in queue "+type+"!", true);
 							return;
 						}
 					}

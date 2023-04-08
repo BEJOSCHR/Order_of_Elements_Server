@@ -1,7 +1,5 @@
 package de.bejoschgaming.orderofelements.sessionsystem;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +7,6 @@ import org.apache.mina.core.session.IoSession;
 
 import de.bejoschgaming.orderofelements.database.DatabaseHandler;
 import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
-import de.bejoschgaming.orderofelements.filesystem.FileHandler;
 
 public class SessionHandler {
 
@@ -47,7 +44,7 @@ public class SessionHandler {
 		
 	}
 	
-	public static boolean checkLoginData(String name, String password) {
+	public static String checkLoginData(String name, String passwordHash) {
 		
 		if(DatabaseHandler.connectedToDB) {
 			//CHECK VIA DB
@@ -55,37 +52,52 @@ public class SessionHandler {
 			String selectedPW = DatabaseHandler.selectString(DatabaseHandler.tabellName_profile, "Password", "Name", name);
 			if(selectedPW == null) {
 				//NO ENTRY FOUND AT ALL
-				return false;
+				return "Wrong username or password!";
 			}else {
-				try {
-					//HASH PW:
-					MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-					messageDigest.update(password.getBytes());
-					String passwordHash = new String(messageDigest.digest());
+				//CHECK IF ALREADY ONLINE
+				if(SessionHandler.isSessionConnected(name) == true) {
+					return "Already online!";
+				}else {
+					//NOT ONLINE
 					if(passwordHash.equals(selectedPW)) {
 						//PW RIGHT
-						return true;
+						return null;
 					}else {
 						//PW WRONG
-						return false;
+						return "Wrong username or password!";
 					}
-				} catch (NoSuchAlgorithmException error) {
-					error.printStackTrace();
-					return false;
 				}
 			}
 			
 		}else {
-			//USE BACKUP FILE
+			//NO DB ERROR MESSAGE (none specific for security reasons)
+			return "Wrong username or password!";
+		}
+		
+	}
+	
+	/**
+	 * Null as result means the login data is free for register and valid
+	 * @param name
+	 * @param password
+	 * @return null if all is good, else the cause for failure as String
+	 */
+	public static String checkRegisterData(String name, String password) {
+		
+		if(DatabaseHandler.connectedToDB) {
+			//CHECK VIA DB
 			
-			for(int i = 1 ; i <= 5 ; i++) {
-				String testName = FileHandler.readOutData(FileHandler.file_DbBackupData, "TestUser_"+i);
-				if(testName.equals(name)) {
-					return true;
-				}
+			String selectedPW = DatabaseHandler.selectString(DatabaseHandler.tabellName_profile, "Password", "Name", name);
+			if(selectedPW == null) {
+				//NO ENTRY FOUND AT ALL, so valid for register
+				return null;
+			}else {
+				return "Username already used!";
 			}
-			return false;
 			
+		}else {
+			//NO DB CON
+			return "Invalid username or password!";
 		}
 		
 	}

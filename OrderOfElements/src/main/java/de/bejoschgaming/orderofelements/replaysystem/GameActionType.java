@@ -4,6 +4,7 @@ public enum GameActionType {
 
 	ATTACK,
 	HEAL,
+	SHIELD,
 	MOVE,
 	USE_SPELL,
 	SPAWN,

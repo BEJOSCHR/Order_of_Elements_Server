@@ -3,6 +3,8 @@ package de.bejoschgaming.orderofelements.connection;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
@@ -38,7 +40,14 @@ public class ConnectionHandler {
         } catch(IOException error) {
 			error.printStackTrace();
 			ConsoleHandler.printMessageInConsole("Starting serverconnection failed!", true);
-			System.exit(1);
+			new Timer().schedule(new TimerTask() {
+				@Override
+				public void run() {
+					ConsoleHandler.printMessageInConsole("Terminating...", true);
+					System.exit(0);
+				}
+			}, 1000*3);
+			while(true) {} //FREEZE FOR TIMER EXIT
 		}
 		
 	}
@@ -46,7 +55,7 @@ public class ConnectionHandler {
 	public static void closeServerConnection() {
 		
 		connectionAcceptor.unbind();
-		connectionAcceptor.dispose();
+		connectionAcceptor.dispose(true);
 		ConsoleHandler.printMessageInConsole("Serverconnection closed!", true);
 		
 	}

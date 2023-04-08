@@ -3,7 +3,6 @@ package de.bejoschgaming.orderofelements.gamesystem;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.bejoschgaming.orderofelements.debug.ConsoleHandler;
 import de.bejoschgaming.orderofelements.sessionsystem.ClientSession;
 
 public class GameHandler {
